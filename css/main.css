@@ -1,0 +1,58 @@
+.author {
+  line-height:2em;
+  font-size: 12px;
+}
+.rules-rating {
+  position: absolute; 
+  top: 20px; 
+  right:20px; 
+  /*z-index: 1000; */
+  font-size:20px;
+}
+.rules-list {
+  font-size: 15px;
+}
+.rules-list li {
+  line-height: 24px;
+}
+
+
+.rules-time {
+  font-size:10px; 
+  padding: 10px 0px 0px 25px; 
+  color: gray;
+  float: left;
+}
+
+
+#rulesList .rule:nth-child(odd) {
+  background-color:#eee;
+}
+
+.rule {
+  padding:20px;
+  position: relative;
+  border-radius: 5px;  
+}
+
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
