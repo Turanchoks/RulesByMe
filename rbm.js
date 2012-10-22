@@ -18,7 +18,7 @@ Parse.initialize("7NWULxIRFzuMWrQ6bX1O8mm357Nz7jfHEWXhPevn", "yQmxvt5eKgJfbSCePp
 
 var RuleObject = Parse.Object.extend('Rule', {});
 var RuleCollection = Parse.Collection.extend({model: RuleObject});
-var ruleCollection = new RuleCollection();
+// var ruleCollection = new RuleCollection();
 var RuleView = Parse.View.extend({
 	className: 'rule',
 	template: _.template(config.ruleTemplate),
@@ -30,30 +30,78 @@ var RuleView = Parse.View.extend({
 		return this;
 	}
 });
+
+
+
 var RuleCollectionView = Parse.View.extend({
 	id: 'rulesList',
 	initialize: function(){
 		this.collection.on('add', this.addOne, this);
 	},
 	render: function(){
-		this.collection.forEach(this.addOne, this);
+		this.collection.forEach(this.addOne, this);	
 	},
 	addOne: function(ruleModel){
 		var ruleView = new RuleView({model: ruleModel});
 		ruleView.render()
-		this.$el.prepend(ruleView.$el.fadeToggle('slow'));
+		this.$el.prepend(ruleView.$el.fadeIn()); // FADE IN ON
+
 	}	
 });
-var ruleCollectionView = new RuleCollectionView ({collection: ruleCollection});
-ruleCollection.fetch({
-	success: function(collection) {
-		ruleCollectionView.render();
-		$('#right-column').append(ruleCollectionView.$el);
+// var ruleCollectionView = new RuleCollectionView ({collection: ruleCollection});
+// ruleCollection.fetch({
+// 	success: function(collection) {
+// 		ruleCollectionView.render();
+// 		$('#right-column').append(ruleCollectionView.$el);
+// 	},
+// 	error: function(collection, error) {
+// 		console.warn(error);
+// 	}
+// });
+
+
+var RulesByMe = new(Parse.Router.extend({
+	routes: {
+		"": "index",
+		"rule/:id": "oneRule",
+		"about": "about",
+		"newest": "getNewest"
 	},
-	error: function(collection, error) {
-		console.warn(error);
+	initialize: function(){
+		this.ruleCollection = new RuleCollection();
+		this.ruleCollectionView = new RuleCollectionView ({collection: this.ruleCollection});
+		config.divRules.append(this.ruleCollectionView.el);
+	},
+	start: function(){
+		Parse.history.start({pushState: true});
+	},
+	index: function(){
+		var self = this;
+		this.ruleCollection.fetch({
+			success: function(){
+				self.ruleCollectionView.render()
+			},
+			error: function(){
+
+			}
+		});
+	},
+	getNewest: function(){
+
+	},
+	oneRule: function(id){
+		console.log(id)
+	},
+	about: function(){
+		console.log('about');
 	}
+}));
+
+$(function(){
+	RulesByMe.start()
 });
+
+
 
 
 // SUBMISSION
@@ -68,7 +116,6 @@ $('.btn.publish').click(function(){
 	ruleObjectToPublish.save();
 	ruleCollection.add(ruleObjectToPublish);
 });
-
 
 
 // STYLE
