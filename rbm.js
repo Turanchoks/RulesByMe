@@ -1,16 +1,6 @@
 ////////////
 // CONFIG //
 ////////////
-var config = {
-	ruleTemplate: $('#template-rule').html(),
-	divRules: $('div.rules'),
-	submission: {
-		rulesby: $('input#author'),
-		rule1: $('input#rule1'),
-		rule2: $('input#rule2'),
-		rule3: $('input#rule3')
-	},
-};
 Parse.View = Parse.View.extend({ // change standart behavior of View.remove() to make it detach events
 	remove: function() {
 		this.$el.empty().detach();
@@ -22,12 +12,11 @@ Parse.initialize("7NWULxIRFzuMWrQ6bX1O8mm357Nz7jfHEWXhPevn", "yQmxvt5eKgJfbSCePp
 // STRUCTURE  //
 ////////////////
 var RuleObject = Parse.Object.extend('Rule', {});
-// var RuleCollection = Parse.Collection.extend({
-// 	model: RuleObject,
-// });
-
+var RuleCollection = Parse.Collection.extend({
+ 	model: RuleObject,
+});
 ///////////
-// VIEWS //
+// VIEWS //  
 ///////////
 var RuleView = Parse.View.extend({
 	className: 'rule',
@@ -46,21 +35,21 @@ var RuleView = Parse.View.extend({
 	}
 });
 var RuleCollectionView = Parse.View.extend({
-	id: 'rulesList',
-	tagName: 'ul',
+    el: $('#rulesList'),
 	initialize: function() {
+        if(!this.collection) this.collection = new RuleCollection();
 		this.collection.on('add', this.addOne, this);
 		this.render();
 	},
 	render: function() {
-		this.collection.forEach(this.addOne, this);
-		$('.rightColumn').append(this.el);
+        this.$el.html("");
+		this.collection.forEach(this.addOne, this); 
 	},
 	addOne: function(ruleModel) {
 		var ruleView = new RuleView({
 			model: ruleModel
 		});
-		this.$el.prepend(ruleView.el); // FADE IN ON
+		this.$el.prepend(ruleView.$el.fadeIn());
 	}
 });
 var SubmitRuleView = Parse.View.extend({
@@ -77,14 +66,27 @@ var SubmitRuleView = Parse.View.extend({
 	},
 	submitRule : function() {
 		var ruleObjectToPublish = new RuleObject({
-			rule1: config.submission.rule1.val(),
-			rule2: config.submission.rule2.val(),
-			rule3: config.submission.rule3.val(),
-			author: config.submission.rulesby.val(),
+			rule1: $('input#rule1').val(),
+			rule2: $('input#rule2').val(),
+			rule3: $('input#rule3').val(),
+			author: $('input#author').val(),
 			author_url: 'jlksjad.com'
 		});
-		ruleObjectToPublish.save();
-		RulesByMe.ruleCollection.add(ruleObjectToPublish);		
+        for(key in ruleObjectToPublish.attributes) { // CHECK IF ALL FIELDS ARE NOT EMPTY
+            if(ruleObjectToPublish.attributes[key].length < 1) {
+                alert("Заполните все правила");
+                return false;
+            }
+        }
+		ruleObjectToPublish.save({
+            success: function(obj) {
+                app.rulesView.collection.add(obj); // Do not rerender the whole view by fetching data from server.
+                $('.submission').find('input').val(''); // Clear inputs
+            },
+            error: function(error) {
+                throw new Error(error);
+            }
+		});
 	}
 });
 var NavBarView = Parse.View.extend({
@@ -103,33 +105,45 @@ var AppView = Parse.View.extend({
 	}, 
 	render: function() {
 		var self = this;
-		this.navBar = new NavBarView;
-		this.submitRule = new SubmitRuleView;
-		if(Parse.User.current()){
-
-		} else {
-			queryRules('bestOfMonth').fetch({
-				success: function(collection) {
-					self.rulesView = new RuleCollectionView({collection: collection});
-				},
-				error: function(collection, error) {
-					throw new Error(error);
-				}
-			});
-		}
+        $('.rightColumn').prepend($('#template-gifLoader').html());
+		this.navBar = new NavBarView();
+		this.submitRule = new SubmitRuleView();
+        this.rulesNav = new RulesNav();
+        this.rulesView = new RuleCollectionView();
 	}
+});
+var RulesNav = Parse.View.extend({
+   template: $('#template-rulesNav').html(),
+   className: 'rulesNav',
+   initialize: function() {
+       this.render();
+   },
+   render: function() {
+       this.$el.html(this.template);
+       $('.rightColumn').prepend(this.el);
+   }
 });
 //////////////////////
 // HELPER FUNCTIONS //
 //////////////////////
-function queryRules(condition) {
+function queryRules(condition, userId) {
 	var now   = new Date(); // today
 	var query = new Parse.Query(RuleObject);
 	query.descending('rating');
 	switch(condition) {
-		case 'bestOfMonth':
-			var date = new Date(now.getFullYear(), now.getMonth(), 1,0,0,0,0);
-			query.greaterThanOrEqualTo('createdAt', date);
+		case 'month':
+		var date = new Date(now.getFullYear(), now.getMonth(), 1,0,0,0,0);
+			query.greaterThanOrEqualTo('createdAt', date);     
+            break;
+        case 'week': 
+            now.setDate(now.getDate()-now.getDay()+1);
+            var date = new Date(now.getFullYear(), now.getMonth(), now.getDate(),0,0,0,0);
+            query.greaterThanOrEqualTo('createdAt', date);
+            break;
+        case 'myRules':
+            break;
+        case 'userRules':
+            break;
 	};
 	return query.collection();
 }
@@ -141,70 +155,28 @@ var Router = Parse.Router.extend({
 		"": "index",
 		"rule/:id": "oneRule",
 		"about": "about",
-		"newest": "getNewest"
+		"best/:period": "getBest"
 	},
 	initialize: function() {},
-	index: function() {},
-	getNewest: function() {},
+	index: function() {
+
+	},
+	getBest: function(period) {
+        queryRules(period).fetch({
+            success: function(collection) {
+                app.rulesView.collection = collection;
+                app.rulesView.render();
+            }
+        });
+	},
 	oneRule: function(id) {},
 	about: function() {}
 });
 //////////////
 // ON START //
 //////////////
-// Parse.History.start();
-var app    = new AppView;
-var router = new Router;
-//////////
-// SHIT //
-//////////
-
-// function renderRule(rule){
-// 	return _.template(config.ruleTemplate, rule.toJSON());
-// }
-// $('a.btn').click(function(){
-// 	var ruleObject = new RuleObject();
-// 	ruleObject.set({
-// rule1: 'test1',
-// rule2: 'test2',
-// rule3: 'test3',
-// author: 'test_author',
-// author_url: 'test_author_url',
-// 	});
-// 	ruleObject.save(null, {
-// 		success: function(ruleObject) {
-// 			console.log(ruleObject.toJSON())
-// 		},
-// 		error: function(ruleObject, error) {
-// 			console.log(ruleObject, error)
-// 		}
-// 	});
-// });
-
-// var query = new Parse.Query(RuleObject);
-// query.find({
-// 	success: function(results){
-// 		$.each(results, function(i){
-// 			console.log(this.toJSON())
-// 		})
-// 	},
-// 	error: function(error) {
-// 		console.log(error);
-// 	}
-// });
-
-
-// var ruleCollectionView = new RuleCollectionView ({collection: ruleCollection});
-// ruleCollection.fetch({
-// 	success: function(collection) {
-// 		ruleCollectionView.render();
-// 		$('#right-column').append(ruleCollectionView.$el);
-// 	},
-// 	error: function(collection, error) {
-// 		console.warn(error);
-// 	}
-// });
-// Date.prototype.getWeek = function() {
-// 	var onejan = new Date(this.getFullYear(),0,1);
-// 	return Math.ceil((((this - onejan) / 86400000) + onejan.getDay()+1)/7);
-// }
+var app    = new AppView();
+var router = new Router();
+$(function() {
+   Parse.history.start(); 
+});
