@@ -17,6 +17,7 @@
 }
 ul#rulesList {
   list-style: none;
+  margin:0;
 }
 
 .rules-time {
@@ -36,8 +37,24 @@ ul#rulesList {
   position: relative;
   border-radius: 5px;  
 }
+.rulesNav ul {
+  margin:5px;
+  list-style:none;
+}
+.rulesNav ul li {
+    display:inline;
+    padding:15px;
+}
 
-
+.rulesNav .span2 {
+    margin-left: 0;
+    text-align:center;
+    padding: 5px 6px;
+}
+.loading {
+    text-align:center;
+    display:none;
+}
 /* ==========================================================================
    Author's custom styles
    ========================================================================== */
