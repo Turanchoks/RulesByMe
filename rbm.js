@@ -21,10 +21,34 @@ Parse.initialize("7NWULxIRFzuMWrQ6bX1O8mm357Nz7jfHEWXhPevn", "yQmxvt5eKgJfbSCePp
 ////////////////
 // STRUCTURE  //
 ////////////////
-var RuleObject = Parse.Object.extend('Rule', {});
+var RuleObject = Parse.Object.extend('Rule', {
+	ratingChange: function(increment) {
+		/*var currentUser = Parse.User.current();
+		if (currentUser) {
+			var query = new Parse.Query(Parse.User);
+			var userVoted = query.equalTo("voted", this.id);
+			if((Parse._.indexOf(userVoted, currentUser.id) == -1)) {*/
+				this.increment("rating", increment);
+				this.save();
+			/*	currentUser.add("voted", this.id);
+				currentUser.save();
+			}
+			else {
+				//Придумать интерактив на тему "пошли нахрен"
+			}
+		}
+		else 
+		{
+			//new LogInView(); - показываем 
+		}*/
+	}
+});
 // var RuleCollection = Parse.Collection.extend({
 // 	model: RuleObject,
 // });
+
+
+// RATING SYSTEM //
 
 ///////////
 // VIEWS //
@@ -33,17 +57,33 @@ var RuleView = Parse.View.extend({
 	className: 'rule',
 	tagName: 'li',
 	template: Parse._.template($('#template-rule').html()),
+		events: {
+		'click .ratingPlus' : 'ratingPlus',
+		'click .ratingMinus' : 'ratingMinus'
+	},
 	initialize: function() {
 		this.model.on('change', this.render, this);
+		this.model.on('ratingChange', this.render, this)
 		this.render();
 	},
 	render: function() {
+		if (Parse._.isUndefined(this.model.toJSON().rating)) {
+			this.model.set("rating", 0);							//This is exapmle of hurma! Rule need to be created with rating 0
+		}
+
 		var data = Parse._.extend(this.model.toJSON(), {
-			time: this.model.createdAt
+			time: this.model.createdAt,
 		});
+
 		this.$el.attr('id', 'rule-id-' + this.model.id).html(this.template(data));
 		return this;
-	}
+	},
+	ratingPlus: function() {
+		this.model.ratingChange(1);
+	},
+	ratingMinus: function() {
+		this.model.ratingChange(-1);
+	},
 });
 var RuleCollectionView = Parse.View.extend({
 	id: 'rulesList',
@@ -81,7 +121,8 @@ var SubmitRuleView = Parse.View.extend({
 			rule2: config.submission.rule2.val(),
 			rule3: config.submission.rule3.val(),
 			author: config.submission.rulesby.val(),
-			author_url: 'jlksjad.com'
+			author_url: 'jlksjad.com',
+			rating: 0
 		});
 		ruleObjectToPublish.save();
 		RulesByMe.ruleCollection.add(ruleObjectToPublish);		
@@ -208,3 +249,4 @@ var router = new Router;
 // 	var onejan = new Date(this.getFullYear(),0,1);
 // 	return Math.ceil((((this - onejan) / 86400000) + onejan.getDay()+1)/7);
 // }
+

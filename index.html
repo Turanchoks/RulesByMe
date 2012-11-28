@@ -57,15 +57,20 @@
 
 <!--                     <div class="ruleTime"><%=time%></div>
             <div class="ruleRating"></div> -->
+<!-- <div class='rating'><%=rating%></div> -->
 
         <script type="text/template" id='template-rule'>
-            <div class='author'>Rule By <%=author%></div>
+            <div class='author'>
+                        Rule By <%=author%>
+                        <a class="btn btn-success btn-mini ratingPlus" data-add-rating="1">+</a>
+                        <%=rating%>
+                        <a class="btn btn-danger btn-mini ratingMinus" data-add-rating="-1">-</a>
+            </div>
             <ol class='rulesList'>
                 <li><%=rule1%></li>
                 <li><%=rule2%></li>
                 <li><%=rule3%></li>
             </ol>
-
         </script>
 
         <script type="text/template" id="template-submitRule">
