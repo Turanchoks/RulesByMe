@@ -11,28 +11,7 @@ Parse.initialize("7NWULxIRFzuMWrQ6bX1O8mm357Nz7jfHEWXhPevn", "yQmxvt5eKgJfbSCePp
 ////////////////
 // STRUCTURE  //
 ////////////////
-var RuleObject = Parse.Object.extend('Rule', {
-	ratingChange: function(increment) {
-		/*var currentUser = Parse.User.current();
-		if (currentUser) {
-			var query = new Parse.Query(Parse.User);
-			var userVoted = query.equalTo("voted", this.id);
-			if((Parse._.indexOf(userVoted, currentUser.id) == -1)) {*/
-				this.increment("rating", increment);
-				this.save();
-			/*	currentUser.add("voted", this.id);
-				currentUser.save();
-			}
-			else {
-				//Придумать интерактив на тему "пошли нахрен"
-			}
-		}
-		else 
-		{
-			//new LogInView(); - показываем 
-		}*/
-	}
-});
+var RuleObject = Parse.Object.extend('Rule');
 var RuleCollection = Parse.Collection.extend({
  	model: RuleObject,
 });
@@ -44,17 +23,19 @@ var RuleView = Parse.View.extend({
 	tagName: 'li',
 	template: Parse._.template($('#template-rule').html()),
 		events: {
-		'click .ratingPlus' : 'ratingPlus',
-		'click .ratingMinus' : 'ratingMinus'
+		'click .ratingChange' : 'ratingChange',
 	},
 	initialize: function() {
 		this.model.on('change', this.render, this);
-		this.model.on('ratingChange', this.render, this)
 		this.render();
 	},
-	render: function() {
+	render: function(rating) {
 		if (Parse._.isUndefined(this.model.toJSON().rating)) {
 			this.model.set("rating", 0);							//This is exapmle of hurma! Rule need to be created with rating 0
+		}
+
+		if (Parse._.isUndefined(this.model.toJSON().rating)) {
+			this.model.set("rating", rating);							//This is exapmle of hurma! Rule need to be created with rating 0
 		}
 
 		var data = Parse._.extend(this.model.toJSON(), {
@@ -64,12 +45,17 @@ var RuleView = Parse.View.extend({
 		this.$el.attr('id', 'rule-id-' + this.model.id).html(this.template(data));
 		return this;
 	},
-	ratingPlus: function() {
-		this.model.ratingChange(1);
-	},
-	ratingMinus: function() {
-		this.model.ratingChange(-1);
-	},
+	ratingChange: function(e) {
+		increment = parseInt(e.target.attributes['data-add-rating'].nodeValue);		//Очень не нравится подумайте пожалуйста как сделать лучше!!!
+		Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": 2 }, {
+  			success: function(rating) {
+  				console.log(rating);
+  			},
+  			error: function(error) {
+  				console.error(error);
+	  			}
+			});
+	}
 });
 var RuleCollectionView = Parse.View.extend({
     el: $('#rulesList'),
@@ -109,19 +95,15 @@ var SubmitRuleView = Parse.View.extend({
 			author: $('input#author').val(),
 			author_url: 'jlksjad.com'
 		});
-        for(key in ruleObjectToPublish.attributes) { // CHECK IF ALL FIELDS ARE NOT EMPTY
-            if(ruleObjectToPublish.attributes[key].length < 1) {
-                alert("Заполните все правила");
-                return false;
-            }
-        }
+
 		ruleObjectToPublish.save({
             success: function(obj) {
                 app.rulesView.collection.add(obj); // Do not rerender the whole view by fetching data from server.
                 $('.submission').find('input').val(''); // Clear inputs
             },
-            error: function(error) {
-                throw new Error(error);
+            error: function(obj, error) {
+            	console.log(error);
+                // throw new Error(error);
             }
 		});
 	}
