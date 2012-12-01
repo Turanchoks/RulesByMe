@@ -46,7 +46,8 @@ var RuleView = Parse.View.extend({
 		return this;
 	},
 	ratingChange: function(e) {
-		increment = parseInt(e.target.attributes['data-add-rating'].nodeValue);		//Очень не нравится подумайте пожалуйста как сделать лучше!!!
+		increment = parseInt($(e.srcElement).data('add-rating'));		//Очень не нравится подумайте пожалуйста как сделать лучше!!!
+		console.log(increment);
 		Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
   			success: function(rating) {
   				console.log(rating);

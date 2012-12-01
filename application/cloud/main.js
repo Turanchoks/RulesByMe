@@ -4,7 +4,7 @@ Parse.Cloud.define("ratingChange", function(request, response) {
   var query = new Parse.Query("Rule");
   query.get(request.params.RuleID, {
     success: function(Rule) {
-    	if (request.params.increment != 1 || request.params.increment != -1) 
+    	if (request.params.increment != 1 && request.params.increment != -1) 
     	{
     		response.success("cheat!");
     	}
