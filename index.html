@@ -49,6 +49,9 @@
         <script src="js/plugins.js"></script>
         <script src="js/main.js"></script>
 
+        <!-- FB SDK -->
+        <div id="fb-root"></div>
+
         <script>
             var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
@@ -62,10 +65,10 @@
 
         <script type="text/template" id='template-rule'>
             <div class='author'>
-                        Rule By <%=author%>
-                        <a class="btn btn-success btn-mini ratingPlus" data-add-rating="1">+</a>
-                        <%=rating%>
-                        <a class="btn btn-danger btn-mini ratingMinus" data-add-rating="-1">-</a>
+                Rule By <%=author%>
+                <a class="btn btn-success btn-mini ratingPlus" data-add-rating="1">+</a>
+                <%=rating%>
+                <a class="btn btn-danger btn-mini ratingMinus" data-add-rating="-1">-</a>
             </div>
             <ol class='rulesList'>
                 <li><%=rule1%></li>
@@ -91,6 +94,7 @@
                 </div>                        
             </div>
             <a class="btn btn-large btn-warning publish">ОПУБЛИКОВАТЬ</a>
+            <fb:login-button registration-url="https://c9.io/turanchoks/rulesbyme/workspace/index.html#login" />
         </script>
 
         <script type="text/template" id="template-ruleList">

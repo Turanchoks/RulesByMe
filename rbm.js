@@ -15,9 +15,7 @@ var RuleObject = Parse.Object.extend('Rule', {
 	ratingChange: function(increment) {
 		/*var currentUser = Parse.User.current();
 		if (currentUser) {
-			var query = new Parse.Query(Parse.User);
-			var userVoted = query.equalTo("voted", this.id);
-			if((Parse._.indexOf(userVoted, currentUser.id) == -1)) {*/
+			if((Parse._.indexOf(currentUser.get("voted"), this.id) == -1)) {*/
 				this.increment("rating", increment);
 				this.save();
 			/*	currentUser.add("voted", this.id);
@@ -36,6 +34,34 @@ var RuleObject = Parse.Object.extend('Rule', {
 var RuleCollection = Parse.Collection.extend({
  	model: RuleObject,
 });
+////////////
+// FB SDK //
+////////////
+
+
+  // Load the SDK's source Asynchronously
+  // Note that the debug version is being actively developed and might 
+  // contain some type checks that are overly strict. 
+  // Please report such bugs using the bugs tool.
+  (function(d, debug){
+     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement('script'); js.id = id; js.async = true;
+     js.src = "//connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
+     ref.parentNode.insertBefore(js, ref);
+   }(document, /*debug*/ false));
+
+window.fbAsyncInit = function() {
+    // init the FB JS SDK
+    Parse.FacebookUtils.init({
+      appId      : '452789981444955', // App ID from the App Dashboard
+      status     : true, // check the login status upon init?
+      cookie     : true, // set sessions cookies to allow your server to access the session?
+      xfbml      : true  // parse XFBML tags on this page?
+    });
+    // Additional initialization code such as adding Event Listeners goes here
+};
+
 ///////////
 // VIEWS //  
 ///////////
@@ -43,7 +69,7 @@ var RuleView = Parse.View.extend({
 	className: 'rule',
 	tagName: 'li',
 	template: Parse._.template($('#template-rule').html()),
-		events: {
+	events: {
 		'click .ratingPlus' : 'ratingPlus',
 		'click .ratingMinus' : 'ratingMinus'
 	},
@@ -166,10 +192,10 @@ var RulesNav = Parse.View.extend({
 function queryRules(condition, userId) {
 	var now   = new Date(); // today
 	var query = new Parse.Query(RuleObject);
-	query.descending('rating');
+	query.ascending('rating');
 	switch(condition) {
 		case 'month':
-		var date = new Date(now.getFullYear(), now.getMonth(), 1,0,0,0,0);
+		    var date = new Date(now.getFullYear(), now.getMonth(), 1,0,0,0,0);
 			query.greaterThanOrEqualTo('createdAt', date);     
             break;
         case 'week': 
@@ -181,18 +207,19 @@ function queryRules(condition, userId) {
             break;
         case 'userRules':
             break;
-	};
+	}
 	return query.collection();
 }
 ////////////
 // ROUTER //
 ////////////
 var Router = Parse.Router.extend({
-	routes: {
+    routes: {
 		"": "index",
 		"rule/:id": "oneRule",
 		"about": "about",
-		"best/:period": "getBest"
+		"best/:period": "getBest",
+		"login": "login",
 	},
 	initialize: function() {},
 	index: function() {
@@ -207,7 +234,21 @@ var Router = Parse.Router.extend({
         });
 	},
 	oneRule: function(id) {},
-	about: function() {}
+	about: function() {},
+	login: function () {
+		Parse.FacebookUtils.logIn(null, {
+		  success: function(user) {
+		    if (!user.existed()) {
+		      alert("User signed up and logged in through Facebook!");
+		    } else {
+		      alert("User logged in through Facebook!");
+		    }
+		  },
+		  error: function(user, error) {	
+		    alert("User cancelled the Facebook login or did not fully authorize.");
+		  }
+		});
+	}
 });
 //////////////
 // ON START //
