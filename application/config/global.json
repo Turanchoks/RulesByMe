@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "RulesBy.Me": {
+            "applicationId": "7NWULxIRFzuMWrQ6bX1O8mm357Nz7jfHEWXhPevn", 
+            "masterKey": "2Z122sNSMSK7ceT90nystev2kVeAymbU8hC5s72m"
+        }, 
+        "_default": {
+            "link": "RulesBy.Me"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.1.14"
+    }
+}
