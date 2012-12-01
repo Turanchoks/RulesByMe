@@ -35,8 +35,7 @@ Parse.Cloud.define("ratingChange", function(request, response) {
   });
 });
 
-Parse.Cloud.beforeSave("Rule", function(request, response) {
-
+Parse.Cloud.define("addRule", function(request, response) {
 	function trim (str) {
     str = str.replace(/^\s+/, '');
     for (var i = str.length - 1; i >= 0; i--) {
@@ -48,39 +47,32 @@ Parse.Cloud.beforeSave("Rule", function(request, response) {
     return str;
 	}
 
-	for (var i = 1; i < 4; i++) {
-		var rule =  trim(request.object.get("rule" + i));
-		if (rule.length < 1) {
-			response.error("Заполните, пожалуйста, правило №" + i);
-			return;
-		}
-	};
-	var author = trim(request.object.get("author"));
-	if (author.length < 1) 
+	for(var key in request.params)
 	{
-		response.error("Заполните, пожалуйста, автора");
-		return;
-	};
+		if (trim(request.params[key]).length < 1) {
+			response.error("Заполните все поля!");
+			return;
+		};
+	}
 
-    if (_.isUndefined(request.object.get("rating")))
-    {
-    	request.object.set("rating", 0);
-    };
+	var RuleObject = Parse.Object.extend('Rule');
 
-  	response.success();  
+	var ruleObjectToPublish = new RuleObject({
+		rule1: request.params.rule1,
+		rule2: request.params.rule2,
+		rule3: request.params.rule3,
+		author: request.params.author,
+		author_url: 'jlksjad.com',
+		rating: 0
+	});
+
+	ruleObjectToPublish.save({
+			success: function(obj) {
+				response.success(obj); 
+			},
+			error: function(obj, error) {
+				response.error(error);
+				// throw new Error(error);
+			}
+		});
 });
-
-// Parse.Cloud.afterSave("Rule", function(request) {
-//   query = new Parse.Query("Rule");
-//   query.get(request.object.id, {
-//     success: function(rule) {
-//     	if (_.isUndefined(rule.get("rating")))
-//     	{
-//     		rule.set("rating", 0);
-//     	};
-//     },
-//     error: function(error) {
-//       throw "Got an error " + error.code + " : " + error.message;
-//     }
-//   });
-// });
