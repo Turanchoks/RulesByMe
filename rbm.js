@@ -75,7 +75,7 @@ var RuleView = Parse.View.extend({
 	},
 	initialize: function() {
 		this.model.on('change', this.render, this);
-		this.model.on('ratingChange', this.render, this)
+		this.model.on('ratingChange', this.render, this);
 		this.render();
 	},
 	render: function() {
@@ -86,7 +86,6 @@ var RuleView = Parse.View.extend({
 		var data = Parse._.extend(this.model.toJSON(), {
 			time: this.model.createdAt,
 		});
-
 		this.$el.attr('id', 'rule-id-' + this.model.id).html(this.template(data));
 		return this;
 	},
