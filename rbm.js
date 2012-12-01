@@ -47,7 +47,6 @@ var RuleView = Parse.View.extend({
 	},
 	ratingChange: function(e) {
 		increment = parseInt($(e.srcElement).data('add-rating'));		//Очень не нравится подумайте пожалуйста как сделать лучше!!!
-		console.log(increment);
 		Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
   			success: function(rating) {
   				console.log(rating);
@@ -89,23 +88,22 @@ var SubmitRuleView = Parse.View.extend({
 		this.render();
 	},
 	submitRule : function() {
-		var ruleObjectToPublish = new RuleObject({
+		Parse.Cloud.run('addRule', {
 			rule1: $('input#rule1').val(),
 			rule2: $('input#rule2').val(),
 			rule3: $('input#rule3').val(),
 			author: $('input#author').val(),
 			author_url: 'jlksjad.com'
-		});
-
-		ruleObjectToPublish.save({
-            success: function(obj) {
-                app.rulesView.collection.add(obj); // Do not rerender the whole view by fetching data from server.
-                $('.submission').find('input').val(''); // Clear inputs
-            },
-            error: function(obj, error) {
-            	console.log(error);
-                // throw new Error(error);
-            }
+		},
+		{
+			success: function(obj) {
+				app.rulesView.collection.add(obj); // Do not rerender the whole view by fetching data from server.
+				$('.submission').find('input').val(''); // Clear inputs
+			},
+			error: function(obj, error) {
+				console.log(error);
+				// throw new Error(error);
+			}
 		});
 	}
 });
