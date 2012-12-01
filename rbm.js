@@ -48,8 +48,8 @@ var RuleView = Parse.View.extend({
 	ratingChange: function(e) {
 		increment = parseInt($(e.srcElement).data('add-rating'));		//Очень не нравится подумайте пожалуйста как сделать лучше!!!
 		Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
-  			success: function(rating) {
-  				console.log(rating);
+  			success: function(obj) {
+
   			},
   			error: function(error) {
   				console.error(error);
@@ -88,6 +88,7 @@ var SubmitRuleView = Parse.View.extend({
 		this.render();
 	},
 	submitRule : function() {
+			
 		Parse.Cloud.run('addRule', {
 			rule1: $('input#rule1').val(),
 			rule2: $('input#rule2').val(),
@@ -97,11 +98,12 @@ var SubmitRuleView = Parse.View.extend({
 		},
 		{
 			success: function(obj) {
-				app.rulesView.collection.add(obj); // Do not rerender the whole view by fetching data from server.
+				// app.rulesView.collection.add(obj); // Do not rerender the whole view by fetching data from server.
 				$('.submission').find('input').val(''); // Clear inputs
 			},
 			error: function(obj, error) {
 				console.log(error);
+				alert(error.message);
 				// throw new Error(error);
 			}
 		});
