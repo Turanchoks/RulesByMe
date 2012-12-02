@@ -75,8 +75,8 @@ var RuleView = Parse.View.extend({
 	ratingChange: function(e) {
 		increment = parseInt($(e.srcElement).data('add-rating'));		//Очень не нравится подумайте пожалуйста как сделать лучше!!!
 		Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
-  			success: function(rating) {
-  				console.log(rating);
+  			success: function(obj) {
+
   			},
   			error: function(error) {
   				console.error(error);
@@ -115,8 +115,7 @@ var SubmitRuleView = Parse.View.extend({
 		this.render();
 	},
 	submitRule : function() {
-		Parse.Cloud.run('addRule', 
-            {
+		Parse.Cloud.run('addRule', {
 			rule1: $('input#rule1').val(),
 			rule2: $('input#rule2').val(),
 			rule3: $('input#rule3').val(),
@@ -125,11 +124,12 @@ var SubmitRuleView = Parse.View.extend({
 		},
 		{
 			success: function(obj) {
-				app.rulesView.collection.add(obj); // Do not rerender the whole view by fetching data from server.
+				// app.rulesView.collection.add(obj); // Do not rerender the whole view by fetching data from server.
 				$('.submission').find('input').val(''); // Clear inputs
 			},
 			error: function(obj, error) {
 				console.log(error);
+				alert(error.message);
 				// throw new Error(error);
 			}
 		});
@@ -153,9 +153,13 @@ var AppView = Parse.View.extend({
 		var self = this;
         $('.rightColumn').prepend($('#template-gifLoader').html());
 		this.navBar = new NavBarView();
-		this.submitRule = new SubmitRuleView();
         this.rulesNav = new RulesNav();
         this.rulesView = new RuleCollectionView();
+        if(Parse.User.current()) {
+        	this.submitRule = new SubmitRuleView();
+        } else {
+            this.logInView = new LogInView();
+        }
 	}
 });
 var RulesNav = Parse.View.extend({
@@ -168,6 +172,15 @@ var RulesNav = Parse.View.extend({
        this.$el.html(this.template);
        $('.rightColumn').prepend(this.el);
    }
+});
+var LogInView = Parse.View.extend({
+    template: $('#template-logInView').html(),
+    initialize: function(){
+        this.render()
+    },
+    render: function() {
+        
+    }
 });
 //////////////////////
 // HELPER FUNCTIONS //
@@ -203,6 +216,7 @@ var Router = Parse.Router.extend({
 		"about": "about",
 		"best/:period": "getBest",
 		"login": "login",
+        "myRules" : "myRules"
 	},
 	initialize: function() {},
 	index: function() {
@@ -216,6 +230,9 @@ var Router = Parse.Router.extend({
             }
         });
 	},
+    myRules: function() {
+        console.log(Parse.User.current());  
+    },
 	oneRule: function(id) {},
 	about: function() {},
 	login: function () {
@@ -233,6 +250,44 @@ var Router = Parse.Router.extend({
 		});
 	}
 });
+/////////////////////
+// SOCIAL NETWORKS //
+/////////////////////
+//
+//// OPPA FACEBOOK STYLE!
+//// Инициализация приложения Facebook, стандартная форма с вставленным идентификатором и введёнными функциями Parse
+//window.fbAsyncInit = function() {
+//    // init the FB JS SDK
+//    Parse.FacebookUtils.init({
+//      appId      : '452789981444955', // App ID from the App Dashboard
+//      // channelUrl : '//WWW.YOUR_DOMAIN.COM/channel.html', // Channel File for x-domain communication
+//      status     : true, // check the login status upon init?
+//      cookie     : true, // set sessions cookies to allow your server to access the session?
+//      xfbml      : true  // parse XFBML tags on this page?
+//    });
+//
+//    // Additional initialization code such as adding Event Listeners goes here
+//
+//};
+//
+//// Load the SDK's source Asynchronously
+//// Note that the debug version is being actively developed and might 
+//// contain some type checks that are overly strict. 
+//// Please report such bugs using the bugs tool.
+//(function(d, debug){
+// var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+// if (d.getElementById(id)) {return;}
+// js = d.createElement('script'); js.id = id; js.async = true;
+// js.src = "//connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
+// ref.parentNode.insertBefore(js, ref);
+//}(document, /*debug*/ false));
+////Работа с поступающими при регистрации данными
+//Parse.FacebookUtils.getLoginStatus(function(response) {
+//  if (response.status === 'connected') {
+//    var signedRequest = response.authResponse.signedRequest;
+//  }
+// });
+
 //////////////
 // ON START //
 //////////////
