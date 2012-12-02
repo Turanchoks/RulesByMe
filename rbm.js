@@ -330,6 +330,7 @@ var Router = Parse.Router.extend({
 /////////////////////
 // SOCIAL NETWORKS //
 /////////////////////
+
 //
 //// OPPA FACEBOOK STYLE!
 //// Инициализация приложения Facebook, стандартная форма с вставленным идентификатором и введёнными функциями Parse
@@ -364,6 +365,7 @@ var Router = Parse.Router.extend({
 //    var signedRequest = response.authResponse.signedRequest;
 //  }
 // });
+
 
 //////////////
 // ON START //
