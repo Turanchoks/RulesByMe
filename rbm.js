@@ -224,11 +224,11 @@ window.fbAsyncInit = function() {
  ref.parentNode.insertBefore(js, ref);
 }(document, /*debug*/ false));
 //Работа с поступающими при регистрации данными
-Parse.FacebookUtils.getLoginStatus(function(response) {
-  if (response.status === 'connected') {
-    var signedRequest = response.authResponse.signedRequest;
-  }
- });
+// Parse.FacebookUtils.getLoginStatus(function(response) {
+//   if (response.status === 'connected') {
+//     var signedRequest = response.authResponse.signedRequest;
+//   }
+//  });
 
 //////////////
 // ON START //
