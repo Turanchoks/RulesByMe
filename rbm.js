@@ -82,7 +82,7 @@ var RuleView = Parse.View.extend({
   				console.error(error);
 	  			}
 			});
-	}
+	   }
 });
 var RuleCollectionView = Parse.View.extend({
     el: $('#rulesList'),
@@ -115,7 +115,8 @@ var SubmitRuleView = Parse.View.extend({
 		this.render();
 	},
 	submitRule : function() {
-		Parse.Cloud.run('addRule', {
+		Parse.Cloud.run('addRule', 
+            {
 			rule1: $('input#rule1').val(),
 			rule2: $('input#rule2').val(),
 			rule3: $('input#rule3').val(),
