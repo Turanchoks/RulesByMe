@@ -18,8 +18,6 @@ var RuleCollection = Parse.Collection.extend({
 ////////////
 // FB SDK //
 ////////////
-
-
   // Load the SDK's source Asynchronously
   // Note that the debug version is being actively developed and might 
   // contain some type checks that are overly strict. 
@@ -73,14 +71,21 @@ var RuleView = Parse.View.extend({
 		return this;
 	},
 	ratingChange: function(e) {
-		increment = parseInt($(e.srcElement).data('add-rating'));		//Очень не нравится подумайте пожалуйста как сделать лучше!!!
-		Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
+        var clickedButton = $(e.srcElement);
+        var ratingValue = clickedButton.siblings('.ratingValue');
+		var increment = parseInt($(e.srcElement).data('add-rating'));		//Очень не нравится подумайте пожалуйста как сделать лучше!!!
+		ratingValue.text(parseInt(ratingValue.text())+increment);
+        this.$el.undelegate('.ratingChange', 'click');
+        this.$el.find('.ratingChange').fadeOut()
+        clickedButton.siblings('.ratingChange').off('click');
+        Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
   			success: function(obj) {
 
   			},
   			error: function(error) {
   				console.error(error);
 	  			}
+                  
 			});
 	   }
 });
@@ -109,7 +114,7 @@ var SubmitRuleView = Parse.View.extend({
 	},
 	render: function() {
 		this.$el.html(this.template);
-		$('.leftColumn').append(this.el);
+		$('.firstLeft').html(this.el);
 	},
 	initialize: function() {
 		this.render();
@@ -145,23 +150,7 @@ var NavBarView = Parse.View.extend({
 		this.$el.html(this.template);
 	}
 });
-var AppView = Parse.View.extend({
-	initialize: function() {
-		this.render();
-	}, 
-	render: function() {
-		var self = this;
-        $('.rightColumn').prepend($('#template-gifLoader').html());
-		this.navBar = new NavBarView();
-        this.rulesNav = new RulesNav();
-        this.rulesView = new RuleCollectionView();
-        if(Parse.User.current()) {
-        	this.submitRule = new SubmitRuleView();
-        } else {
-            this.logInView = new LogInView();
-        }
-	}
-});
+
 var RulesNav = Parse.View.extend({
    template: $('#template-rulesNav').html(),
    className: 'rulesNav',
@@ -176,11 +165,93 @@ var RulesNav = Parse.View.extend({
 var LogInView = Parse.View.extend({
     template: $('#template-logInView').html(),
     initialize: function(){
-        this.render()
+        this.render();
     },
     render: function() {
-        
+        this.$el.html(this.template);
+        $('.firstLeft').html(this.el);
+    },
+    events: {
+		"click #loginbutton": "login",
+		"keypress #password": "goOnEnter",
+        "click #signupView": "signupView"
+	},
+	goOnEnter: function(e) {
+		if(e.keyCode == 13) this.login();
+	},
+	login: function(e) {
+		var self = this;
+		Parse.User.logIn($("#email").val(), $("#password").val(), {
+			success: function(user) {
+                self.remove();
+                app.submitRule = new SubmitRuleView();
+			},
+			error: function(user, error) {
+				console.warn(user, error);
+			}
+		});
+	},
+    signupView: function() {
+        if(app.logInView) 
+            app.logInView.remove();
+        app.signUpView = new SignUpView();   
     }
+});
+var SignUpView = Parse.View.extend({
+    template: $('#template-signUp').html(),
+    events: {
+		"click #signupbutton": "signup",
+		"keypress #password": "goOnEnter",
+        "click #loginView": "loginView"
+	},
+    initialize: function(){
+        this.render();
+    },
+    goOnEnter: function(e) {
+		if(e.keyCode == 13) this.signup();
+	},
+    render: function() {
+        this.$el.html(this.template);
+        $('.firstLeft').html(this.el);
+    },
+    signup: function(e) {
+        var self = this;
+		var user = new Parse.User();
+		user.set("username", $("#fullName").val());
+		user.set("password", $("#password").val());
+		user.set("email", $("#email").val());
+        user.signUp(null,{
+            success: function() {
+                self.remove();
+                app.submitRule = new SubmitRuleView();
+            },
+            error: function(user, error) {
+                console.warn(error.message);
+            }
+        })
+	},
+    loginView: function() {
+        if(app.signUpView) 
+            app.signUpView.remove();
+        app.logInView = new LogInView();   
+    }
+});
+var AppView = Parse.View.extend({
+    initialize: function() {
+		this.render();
+	}, 
+	render: function() {
+		var self = this;
+        $('.rightColumn').prepend($('#template-gifLoader').html());
+		this.navBar = new NavBarView();
+        this.rulesNav = new RulesNav();
+        this.rulesView = new RuleCollectionView();
+        if(Parse.User.current()) {
+        	this.submitRule = new SubmitRuleView();
+        } else {
+            this.logInView = new LogInView();
+        }
+	}
 });
 //////////////////////
 // HELPER FUNCTIONS //
@@ -216,7 +287,8 @@ var Router = Parse.Router.extend({
 		"about": "about",
 		"best/:period": "getBest",
 		"login": "login",
-        "myRules" : "myRules"
+        "myRules" : "myRules",
+        "logout": "logout"
 	},
 	initialize: function() {},
 	index: function() {
@@ -236,19 +308,24 @@ var Router = Parse.Router.extend({
 	oneRule: function(id) {},
 	about: function() {},
 	login: function () {
-		Parse.FacebookUtils.logIn(null, {
-		  success: function(user) {
-		    if (!user.existed()) {
-		      alert("User signed up and logged in through Facebook!");
-		    } else {
-		      alert("User logged in through Facebook!");
-		    }
-		  },
-		  error: function(user, error) {	
-		    alert("User cancelled the Facebook login or did not fully authorize.");
-		  }
-		});
-	}
+//		Parse.FacebookUtils.logIn(null, {
+//		  success: function(user) {
+//		    if (!user.existed()) {
+//		      alert("User signed up and logged in through Facebook!");
+//		    } else {
+//		      alert("User logged in through Facebook!");
+//		    }
+//		  },
+//		  error: function(user, error) {	
+//		    alert("User cancelled the Facebook login or did not fully authorize.");
+//		  }
+//		});
+	},
+    logout: function() {
+        Parse.User.logOut();
+        app.submitRule.remove();
+        app.logInView = new LogInView();
+    }
 });
 /////////////////////
 // SOCIAL NETWORKS //

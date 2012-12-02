@@ -18,7 +18,6 @@
         </style>
         <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
         <link rel="stylesheet" href="css/main.css">
-
         <script src="js/vendor/modernizr-2.6.1-respond-1.1.0.min.js"></script>
     </head>
     <body>
@@ -30,8 +29,12 @@
         <div class="container">
             <div class="row">
                 <div class="span6 leftColumn">
+                    <div class="head"></div>
+                    <div class="firstLeft"></div>
+                    <div class="secondLeft"></div>
                 </div>
                 <div class="span6 rightColumn">
+                    <div class="head"></div>
                     <ul id="rulesList"></ul>
                 </div>                
             </div>
@@ -45,10 +48,8 @@
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
         <script src="js/vendor/bootstrap.min.js"></script>
         <script type="text/javascript" src="js/parse.js"></script>
-
         <script src="js/plugins.js"></script>
         <script src="js/main.js"></script>
-
         <!-- FB SDK -->
         <div id="fb-root"></div>
 
@@ -67,7 +68,7 @@
             <div class='author'>
                 Rule By <%=author%>
                 <a class="btn btn-success btn-mini ratingChange" data-add-rating="1">+</a>
-                <%=rating%>
+                <span class="ratingValue"><%=rating%></span>
                 <a class="btn btn-danger btn-mini ratingChange" data-add-rating="-1">-</a>
             </div>
             <ol class='rulesList'>
@@ -94,7 +95,6 @@
                 </div>                        
             </div>
             <a class="btn btn-large btn-warning publish">ОПУБЛИКОВАТЬ</a>
-            <fb:login-button registration-url="https://c9.io/turanchoks/rulesbyme/workspace/index.html#login" />
         </script>
 
         <script type="text/template" id="template-ruleList">
@@ -124,6 +124,7 @@
                                 <li class="active"><a href="#">Home</a></li>
                                 <li><a href="#about">About</a></li>
                                 <li><a href="#contact">Contact</a></li>
+                                <li><a href="#logout">Logout</a></li>
                             </ul>
                         </div>
                     </div>
@@ -134,7 +135,15 @@
             <div class="loading"><img src="img/ajax-loader.gif"/></div>
         </script>
         <script type="text/template" id="template-logInView">
-            
+            <p><label>username: </label><input type="text" name="email" id="email" /></p>
+            <p><label>password: </label><input type="password" name="password" id="password"/></p>
+            <p><button type="button" class="btn" id="loginbutton">log in</button> or <a href="#signup" id="signupView">sign up</a></p>
+        </script>
+        <script type="text/template" id="template-signUp">
+            <p><label>name: </label><input type="text" name="fullName" id="fullName" /></p>
+            <p><label>email: </label><input type="text" name="email" id="email" /></p>
+            <p><label>password: </label><input type="password" name="password" id="password"/></p>
+            <p><a href="#login" id="loginView">Login</a> or <button type="button" class="btn" id="signupbutton">sign up</button></p>
         </script>
 
         <script type="text/javascript" src="rbm.js"></script>
