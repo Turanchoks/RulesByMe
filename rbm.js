@@ -15,6 +15,32 @@ var RuleObject = Parse.Object.extend('Rule');
 var RuleCollection = Parse.Collection.extend({
  	model: RuleObject,
 });
+////////////
+// FB SDK //
+////////////
+  // Load the SDK's source Asynchronously
+  // Note that the debug version is being actively developed and might 
+  // contain some type checks that are overly strict. 
+  // Please report such bugs using the bugs tool.
+  (function(d, debug){
+     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement('script'); js.id = id; js.async = true;
+     js.src = "//connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
+     ref.parentNode.insertBefore(js, ref);
+   }(document, /*debug*/ false));
+
+window.fbAsyncInit = function() {
+    // init the FB JS SDK
+    Parse.FacebookUtils.init({
+      appId      : '452789981444955', // App ID from the App Dashboard
+      status     : true, // check the login status upon init?
+      cookie     : true, // set sessions cookies to allow your server to access the session?
+      xfbml      : true  // parse XFBML tags on this page?
+    });
+    // Additional initialization code such as adding Event Listeners goes here
+};
+
 ///////////
 // VIEWS //  
 ///////////
@@ -22,7 +48,7 @@ var RuleView = Parse.View.extend({
 	className: 'rule',
 	tagName: 'li',
 	template: Parse._.template($('#template-rule').html()),
-		events: {
+	events: {
 		'click .ratingChange' : 'ratingChange',
 	},
 	initialize: function() {
@@ -41,21 +67,27 @@ var RuleView = Parse.View.extend({
 		var data = Parse._.extend(this.model.toJSON(), {
 			time: this.model.createdAt,
 		});
-
 		this.$el.attr('id', 'rule-id-' + this.model.id).html(this.template(data));
 		return this;
 	},
 	ratingChange: function(e) {
-		increment = parseInt($(e.srcElement).data('add-rating'));		//Очень не нравится подумайте пожалуйста как сделать лучше!!!
-		Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
-  			success: function(rating) {
-  				console.log(rating);
+        var clickedButton = $(e.srcElement);
+        var ratingValue = clickedButton.siblings('.ratingValue');
+		var increment = parseInt($(e.srcElement).data('add-rating'));		//Очень не нравится подумайте пожалуйста как сделать лучше!!!
+		ratingValue.text(parseInt(ratingValue.text())+increment);
+        this.$el.undelegate('.ratingChange', 'click');
+        this.$el.find('.ratingChange').fadeOut()
+        clickedButton.siblings('.ratingChange').off('click');
+        Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
+  			success: function(obj) {
+
   			},
   			error: function(error) {
   				console.error(error);
 	  			}
+                  
 			});
-	}
+	   }
 });
 var RuleCollectionView = Parse.View.extend({
     el: $('#rulesList'),
@@ -82,7 +114,7 @@ var SubmitRuleView = Parse.View.extend({
 	},
 	render: function() {
 		this.$el.html(this.template);
-		$('.leftColumn').append(this.el);
+		$('.firstLeft').html(this.el);
 	},
 	initialize: function() {
 		this.render();
@@ -97,11 +129,12 @@ var SubmitRuleView = Parse.View.extend({
 		},
 		{
 			success: function(obj) {
-				app.rulesView.collection.add(obj); // Do not rerender the whole view by fetching data from server.
+				// app.rulesView.collection.add(obj); // Do not rerender the whole view by fetching data from server.
 				$('.submission').find('input').val(''); // Clear inputs
 			},
 			error: function(obj, error) {
 				console.log(error);
+				alert(error.message);
 				// throw new Error(error);
 			}
 		});
@@ -117,19 +150,7 @@ var NavBarView = Parse.View.extend({
 		this.$el.html(this.template);
 	}
 });
-var AppView = Parse.View.extend({
-	initialize: function() {
-		this.render();
-	}, 
-	render: function() {
-		var self = this;
-        $('.rightColumn').prepend($('#template-gifLoader').html());
-		this.navBar = new NavBarView();
-		this.submitRule = new SubmitRuleView();
-        this.rulesNav = new RulesNav();
-        this.rulesView = new RuleCollectionView();
-	}
-});
+
 var RulesNav = Parse.View.extend({
    template: $('#template-rulesNav').html(),
    className: 'rulesNav',
@@ -141,16 +162,107 @@ var RulesNav = Parse.View.extend({
        $('.rightColumn').prepend(this.el);
    }
 });
+var LogInView = Parse.View.extend({
+    template: $('#template-logInView').html(),
+    initialize: function(){
+        this.render();
+    },
+    render: function() {
+        this.$el.html(this.template);
+        $('.firstLeft').html(this.el);
+    },
+    events: {
+		"click #loginbutton": "login",
+		"keypress #password": "goOnEnter",
+        "click #signupView": "signupView"
+	},
+	goOnEnter: function(e) {
+		if(e.keyCode == 13) this.login();
+	},
+	login: function(e) {
+		var self = this;
+		Parse.User.logIn($("#email").val(), $("#password").val(), {
+			success: function(user) {
+                self.remove();
+                app.submitRule = new SubmitRuleView();
+			},
+			error: function(user, error) {
+				console.warn(user, error);
+			}
+		});
+	},
+    signupView: function() {
+        if(app.logInView) 
+            app.logInView.remove();
+        app.signUpView = new SignUpView();   
+    }
+});
+var SignUpView = Parse.View.extend({
+    template: $('#template-signUp').html(),
+    events: {
+		"click #signupbutton": "signup",
+		"keypress #password": "goOnEnter",
+        "click #loginView": "loginView"
+	},
+    initialize: function(){
+        this.render();
+    },
+    goOnEnter: function(e) {
+		if(e.keyCode == 13) this.signup();
+	},
+    render: function() {
+        this.$el.html(this.template);
+        $('.firstLeft').html(this.el);
+    },
+    signup: function(e) {
+        var self = this;
+		var user = new Parse.User();
+		user.set("username", $("#fullName").val());
+		user.set("password", $("#password").val());
+		user.set("email", $("#email").val());
+        user.signUp(null,{
+            success: function() {
+                self.remove();
+                app.submitRule = new SubmitRuleView();
+            },
+            error: function(user, error) {
+                console.warn(error.message);
+            }
+        })
+	},
+    loginView: function() {
+        if(app.signUpView) 
+            app.signUpView.remove();
+        app.logInView = new LogInView();   
+    }
+});
+var AppView = Parse.View.extend({
+    initialize: function() {
+		this.render();
+	}, 
+	render: function() {
+		var self = this;
+        $('.rightColumn').prepend($('#template-gifLoader').html());
+		this.navBar = new NavBarView();
+        this.rulesNav = new RulesNav();
+        this.rulesView = new RuleCollectionView();
+        if(Parse.User.current()) {
+        	this.submitRule = new SubmitRuleView();
+        } else {
+            this.logInView = new LogInView();
+        }
+	}
+});
 //////////////////////
 // HELPER FUNCTIONS //
 //////////////////////
 function queryRules(condition, userId) {
 	var now   = new Date(); // today
 	var query = new Parse.Query(RuleObject);
-	query.descending('rating');
+	query.ascending('rating');
 	switch(condition) {
 		case 'month':
-		var date = new Date(now.getFullYear(), now.getMonth(), 1,0,0,0,0);
+		    var date = new Date(now.getFullYear(), now.getMonth(), 1,0,0,0,0);
 			query.greaterThanOrEqualTo('createdAt', date);     
             break;
         case 'week': 
@@ -162,18 +274,21 @@ function queryRules(condition, userId) {
             break;
         case 'userRules':
             break;
-	};
+	}
 	return query.collection();
 }
 ////////////
 // ROUTER //
 ////////////
 var Router = Parse.Router.extend({
-	routes: {
+    routes: {
 		"": "index",
 		"rule/:id": "oneRule",
 		"about": "about",
-		"best/:period": "getBest"
+		"best/:period": "getBest",
+		"login": "login",
+        "myRules" : "myRules",
+        "logout": "logout"
 	},
 	initialize: function() {},
 	index: function() {
@@ -187,9 +302,71 @@ var Router = Parse.Router.extend({
             }
         });
 	},
+    myRules: function() {
+        console.log(Parse.User.current());  
+    },
 	oneRule: function(id) {},
-	about: function() {}
+	about: function() {},
+	login: function () {
+//		Parse.FacebookUtils.logIn(null, {
+//		  success: function(user) {
+//		    if (!user.existed()) {
+//		      alert("User signed up and logged in through Facebook!");
+//		    } else {
+//		      alert("User logged in through Facebook!");
+//		    }
+//		  },
+//		  error: function(user, error) {	
+//		    alert("User cancelled the Facebook login or did not fully authorize.");
+//		  }
+//		});
+	},
+    logout: function() {
+        Parse.User.logOut();
+        app.submitRule.remove();
+        app.logInView = new LogInView();
+    }
 });
+/////////////////////
+// SOCIAL NETWORKS //
+/////////////////////
+
+//
+//// OPPA FACEBOOK STYLE!
+//// Инициализация приложения Facebook, стандартная форма с вставленным идентификатором и введёнными функциями Parse
+//window.fbAsyncInit = function() {
+//    // init the FB JS SDK
+//    Parse.FacebookUtils.init({
+//      appId      : '452789981444955', // App ID from the App Dashboard
+//      // channelUrl : '//WWW.YOUR_DOMAIN.COM/channel.html', // Channel File for x-domain communication
+//      status     : true, // check the login status upon init?
+//      cookie     : true, // set sessions cookies to allow your server to access the session?
+//      xfbml      : true  // parse XFBML tags on this page?
+//    });
+//
+//    // Additional initialization code such as adding Event Listeners goes here
+//
+//};
+//
+//// Load the SDK's source Asynchronously
+//// Note that the debug version is being actively developed and might 
+//// contain some type checks that are overly strict. 
+//// Please report such bugs using the bugs tool.
+//(function(d, debug){
+// var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+// if (d.getElementById(id)) {return;}
+// js = d.createElement('script'); js.id = id; js.async = true;
+// js.src = "//connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
+// ref.parentNode.insertBefore(js, ref);
+//}(document, /*debug*/ false));
+////Работа с поступающими при регистрации данными
+//Parse.FacebookUtils.getLoginStatus(function(response) {
+//  if (response.status === 'connected') {
+//    var signedRequest = response.authResponse.signedRequest;
+//  }
+// });
+
+
 //////////////
 // ON START //
 //////////////
