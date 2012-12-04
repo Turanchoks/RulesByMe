@@ -67,7 +67,6 @@ body {
 }
 .ratingChange:hover, .ratingChange:focus {
   text-decoration: none;
-  /*color: #F89406;*/
   color: #FFF;
   background-color: #F89406;
 }
@@ -88,6 +87,20 @@ body {
   padding: 0px 0px 0px 25px; 
   color: gray;
   font-style: italic;
+}
+
+.rulesNav a{
+  color:#F89406;
+  font-weight: bold;
+  padding:10px;
+  font-size: 16px;
+}
+.rulesNav a:hover,.rulesNav a:focus{
+  color:#F89406;
+  font-weight: bold;
+  text-decoration: none;
+  color: #FFF;
+  background-color: #F89406;
 }
 /* ==========================================================================
    Author's custom styles

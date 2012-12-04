@@ -62,7 +62,7 @@
         <script type="text/template" id='template-rule'>
             <div id="rule-id-<%=objectId%>">
                 <div class='author'>
-                    Rule By <a href="<%=author_url%>" class="authorUrl"><%=author%></a>
+                    Rule By <a href="<%=author.url%>" class="authorUrl"><%=author.username%></a>
                     <div class="rating">
                         <a class="ratingChange" data-add-rating="1">+</a>
                         <span class="ratingValue"><%=rating%></span>
@@ -98,11 +98,9 @@
         </script>
 
         <script type="text/template" id="template-rulesNav">
-            <div class="clearfix">
-                <div class="span2"><a href="#best/week">Лучшие недели</a></div>
-                <div class="span2"><a href="#best/month">Лучшие месяца</a></div>
-                <div class="span2"><a href="#myRules">Мои правила</a></div>
-            </div>
+            <div class="span2"><a href="#best/week">Лучшие недели</a></div>
+            <div class="span2"><a href="#best/month">Лучшие месяца</a></div>
+            <div class="span2"><a href="#myRules">Мои правила</a></div>
         </script>
 
         <script type="text/template" id="template-navBar">

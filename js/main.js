@@ -49,7 +49,7 @@ var RuleView = Parse.View.extend({
         this.undelegateEvents('click .ratingChange');
         Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
   			success: function(obj) {
-
+  				console.log(obj);
   			},
   			error: function(error) {
   				console.error(error);
@@ -104,11 +104,11 @@ var SubmitRuleView = Parse.View.extend({
 			success: function(obj) {
 				// app.rulesView.collection.add(obj); // Do not rerender the whole view by fetching data from server.
 				$('.submission').find('input').val(''); // Clear inputs
+				console.log(obj);
 			},
-			error: function(obj, error) {
-				console.log(error);
-				alert(error.message);
-				// throw new Error(error);
+			error: function(error, obj) {
+				console.error(JSON.parse(error.message).message);
+				alert(JSON.parse(error.message).message);
 			}
 		});
 	}
@@ -126,7 +126,7 @@ var NavBarView = Parse.View.extend({
 
 var RulesNav = Parse.View.extend({
    template: $('#template-rulesNav').html(),
-   className: 'rulesNav',
+   className: 'rulesNav clearfix',
    initialize: function() {
        this.render();
    },
@@ -258,6 +258,7 @@ var Router = Parse.Router.extend({
     routes: {
 		"": "index",
 		"rule/:id": "oneRule",
+		"author/:id": "rulesByAuthor",
 		"about": "about",
 		"best/:period": "getBest",
 		"login": "login",
@@ -299,6 +300,9 @@ var Router = Parse.Router.extend({
         Parse.User.logOut();
         app.submitRule.remove();
         app.logInView = new LogInView();
+    },
+    rulesByAuthor: function(id) {
+
     }
 });
 //////////////

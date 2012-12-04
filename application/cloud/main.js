@@ -55,18 +55,20 @@ Parse.Cloud.define("addRule", function(request, response) {
 		rule1: request.params.rule1,
 		rule2: request.params.rule2,
 		rule3: request.params.rule3,
-		author: request.params.author,
-		author_url: request.params.author_url,
+		author: {
+			id: request.user.id,
+			url: request.user.get('url'),
+			username: request.user.get('username'),
+		},
 		rating: 0
 	});
-
 	ruleObjectToPublish.save({
 			success: function(obj) {
 				response.success(obj); 
 			},
-			error: function(obj, error) {
-				response.error(error);
+			error: function(error, obj) {
+				response.error(error, obj);
 				// throw new Error(error);
 			}
-		});
+	});
 });
