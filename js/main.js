@@ -8,10 +8,20 @@ Parse.View = Parse.View.extend({ // change standart behavior of View.remove() to
 	}
 });
 Parse.initialize("7NWULxIRFzuMWrQ6bX1O8mm357Nz7jfHEWXhPevn", "yQmxvt5eKgJfbSCePpBM040ZUMj3iNHiucWBlpas");
+function dateToString(date) {
+	var trimmedDate = date.getFullYear().toString();
+	trimmedDate += '-';
+	trimmedDate += (date.getMonth().toString().length == 1) ? '0'+date.getMonth().toString() : date.getMonth().toString();
+	trimmedDate += '-';
+	trimmedDate += (date.getDate().toString().length == 1) ? '0'+date.getDate().toString() : date.getDate().toString();
+	trimmedDate += ' ';
+	trimmedDate += date.toLocaleTimeString().substring(0,5);
+	return trimmedDate
+}
 ////////////////
 // STRUCTURE  //
 ////////////////
-var RuleObject = Parse.Object.extend('Rule');
+var RuleObject = Parse.Object.extend('Rule',{});
 var RuleCollection = Parse.Collection.extend({
  	model: RuleObject,
 });
@@ -26,15 +36,12 @@ var RuleView = Parse.View.extend({
 		'click .ratingChange' : 'ratingChange',
 	},
 	initialize: function() {
-		this.model.on('change', this.render, this);
+		this.model.on('change', this.render, this);	
+		this.model.set('datetime', dateToString(this.model.createdAt));
 		this.render();
 	},
 	render: function(rating) {
-		var data = Parse._.extend(this.model.toJSON(), { // FOR TEMPORARY PURPOSES
-			time: this.model.createdAt,
-			id: this.model.id
-		});
-		this.$el.html(this.template(data));
+		this.$el.html(this.template(this.model.toJSON()));
 	},
 	ratingChange: function(e) {
         var increment = parseInt($(e.target).data('add-rating'));
@@ -83,13 +90,16 @@ var SubmitRuleView = Parse.View.extend({
 		this.render();
 	},
 	submitRule : function() {
-		Parse.Cloud.run('addRule', {
+		var now = new Date();
+		var objectToPublish = {
 			rule1: $('input#rule1').val(),
 			rule2: $('input#rule2').val(),
 			rule3: $('input#rule3').val(),
 			author: $('input#author').val(),
-			author_url: 'jlksjad.com'
-		},
+			author_url: 'jlksjad.com',
+			// date: now.getFullYear().toString()+'-'+now.getMonth().toString()+'-'+now.getDate().toString()
+		};
+		Parse.Cloud.run('addRule', objectToPublish,
 		{
 			success: function(obj) {
 				// app.rulesView.collection.add(obj); // Do not rerender the whole view by fetching data from server.
@@ -183,6 +193,7 @@ var SignUpView = Parse.View.extend({
 		user.set("username", $("#fullName").val());
 		user.set("password", $("#password").val());
 		user.set("email", $("#email").val());
+		user.set("url",'test@test.com'); // !CHANGE TO Parse.User.current().get('url');
         user.signUp(null,{
             success: function() {
                 self.remove();

@@ -49,7 +49,7 @@
         <script src="js/vendor/bootstrap.min.js"></script>
         <script type="text/javascript" src="js/parse.js"></script>
         <script src="js/plugins.js"></script>
-        <!-- FB SDK -->
+    <!-- FB SDK -->
         <div id="fb-root"></div>
 
         <script>
@@ -59,23 +59,22 @@
             s.parentNode.insertBefore(g,s)}(document,'script'));
         </script>
 
-<!--                     <div class="ruleTime"><%=time%></div>
-            <div class="ruleRating"></div> -->
-<!-- <div class='rating'><%=rating%></div> -->
-
         <script type="text/template" id='template-rule'>
-            <div id="rule-id-<%=id%>">
+            <div id="rule-id-<%=objectId%>">
                 <div class='author'>
-                    Rule By <%=author%>
-                    <a class="btn btn-success btn-mini ratingChange" data-add-rating="1">+</a>
-                    <span class="ratingValue"><%=rating%></span>
-                    <a class="btn btn-danger btn-mini ratingChange" data-add-rating="-1">-</a>
+                    Rule By <a href="<%=author_url%>" class="authorUrl"><%=author%></a>
+                    <div class="rating">
+                        <a class="ratingChange" data-add-rating="1">+</a>
+                        <span class="ratingValue"><%=rating%></span>
+                        <a class="ratingChange" data-add-rating="-1">–</a>                        
+                    </div>
                 </div>
                 <ol class='rulesList'>
                     <li><%=rule1%></li>
                     <li><%=rule2%></li>
                     <li><%=rule3%></li>
                 </ol>
+                <div class="ruleDatetime"><%=datetime%></div>
             </div>
         </script>
 

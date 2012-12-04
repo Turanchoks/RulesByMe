@@ -14,13 +14,13 @@ function trim (str) {
 
 Parse.Cloud.define("ratingChange", function(request, response) {
 	if (request.params.increment != 1 && request.params.increment != -1) {
-    	response.success("cheat!");
+		response.success("cheat!");
 		return;
 	}
 	var query = new Parse.Query("Rule");
 	query.get(request.params.RuleID, {
 		success: function(Rule) {
-		    	/*if (request.user) {
+			/*if (request.user) {
 					if((Parse._.indexOf(request.user.get("voted"), Rule.id) == -1)) {*/
 						Rule.increment("rating", request.params.increment);
 						Rule.save();
@@ -37,11 +37,11 @@ Parse.Cloud.define("ratingChange", function(request, response) {
 				{
 					//new LogInView(); - показываем 
 				}*/
-	    },
+		},
 		error: function() {
-	      response.error("rule not found");
-	    }
-  });
+			response.error("rule not found");
+		}
+	});
 });
 
 Parse.Cloud.define("addRule", function(request, response) {
