@@ -49,7 +49,6 @@
         <script src="js/vendor/bootstrap.min.js"></script>
         <script type="text/javascript" src="js/parse.js"></script>
         <script src="js/plugins.js"></script>
-        <script src="js/main.js"></script>
         <!-- FB SDK -->
         <div id="fb-root"></div>
 
@@ -65,17 +64,19 @@
 <!-- <div class='rating'><%=rating%></div> -->
 
         <script type="text/template" id='template-rule'>
-            <div class='author'>
-                Rule By <%=author%>
-                <a class="btn btn-success btn-mini ratingChange" data-add-rating="1">+</a>
-                <span class="ratingValue"><%=rating%></span>
-                <a class="btn btn-danger btn-mini ratingChange" data-add-rating="-1">-</a>
+            <div id="rule-id-<%=id%>">
+                <div class='author'>
+                    Rule By <%=author%>
+                    <a class="btn btn-success btn-mini ratingChange" data-add-rating="1">+</a>
+                    <span class="ratingValue"><%=rating%></span>
+                    <a class="btn btn-danger btn-mini ratingChange" data-add-rating="-1">-</a>
+                </div>
+                <ol class='rulesList'>
+                    <li><%=rule1%></li>
+                    <li><%=rule2%></li>
+                    <li><%=rule3%></li>
+                </ol>
             </div>
-            <ol class='rulesList'>
-                <li><%=rule1%></li>
-                <li><%=rule2%></li>
-                <li><%=rule3%></li>
-            </ol>
         </script>
 
         <script type="text/template" id="template-submitRule">
@@ -97,10 +98,6 @@
             <a class="btn btn-large btn-warning publish">ОПУБЛИКОВАТЬ</a>
         </script>
 
-        <script type="text/template" id="template-ruleList">
-            
-        </script>
-        
         <script type="text/template" id="template-rulesNav">
             <div class="clearfix">
                 <div class="span2"><a href="#best/week">Лучшие недели</a></div>
@@ -139,6 +136,7 @@
             <p><label>password: </label><input type="password" name="password" id="password"/></p>
             <p><button type="button" class="btn" id="loginbutton">log in</button> or <a href="#signup" id="signupView">sign up</a></p>
         </script>
+
         <script type="text/template" id="template-signUp">
             <p><label>name: </label><input type="text" name="fullName" id="fullName" /></p>
             <p><label>email: </label><input type="text" name="email" id="email" /></p>
@@ -146,7 +144,7 @@
             <p><a href="#login" id="loginView">Login</a> or <button type="button" class="btn" id="signupbutton">sign up</button></p>
         </script>
 
-        <script type="text/javascript" src="rbm.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
 
     </body>
 </html>
