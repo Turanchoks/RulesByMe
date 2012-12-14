@@ -283,18 +283,18 @@ var Router = Parse.Router.extend({
 	oneRule: function(id) {},
 	about: function() {},
 	login: function () {
-//		Parse.FacebookUtils.logIn(null, {
-//		  success: function(user) {
-//		    if (!user.existed()) {
-//		      alert("User signed up and logged in through Facebook!");
-//		    } else {
-//		      alert("User logged in through Facebook!");
-//		    }
-//		  },
-//		  error: function(user, error) {	
-//		    alert("User cancelled the Facebook login or did not fully authorize.");
-//		  }
-//		});
+		Parse.FacebookUtils.logIn(null, {
+		  success: function(user) {
+		    if (!user.existed()) {
+		      alert("Пользователь подписался и вошёл с помощью Facebook!");
+		    } else {
+		      alert("Пользователь вошёл с помощью Facebook!");
+		    }
+		  },
+		  error: function(user, error) {	
+		    alert("Пользователь отменил взод при помощи Facebook или неполностью авторизировался.");
+		  }
+		});
 	},
     logout: function() {
         Parse.User.logOut();
