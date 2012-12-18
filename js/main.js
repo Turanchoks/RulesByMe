@@ -296,6 +296,7 @@ var Router = Parse.Router.extend({
 		  },
 		  error: function(user, error) {	
 		    alert("Пользователь отменил взод при помощи Facebook или неполностью авторизировался.");
+		    console.log(user);
 		  }
 		});
 	},
