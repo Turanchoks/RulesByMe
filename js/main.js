@@ -149,7 +149,6 @@ var LogInView = Parse.View.extend({
 		"click #loginFB": "login",
 		"click #loginTw": "login",	// For future coding
 		"click #loginVK": "login",	// For future coding
-		"keypress #password": "goOnEnter",
         "click #signupView": "signupView"
 	},
 	goOnEnter: function(e) {
