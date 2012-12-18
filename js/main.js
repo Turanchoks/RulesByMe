@@ -135,6 +135,7 @@ var RulesNav = Parse.View.extend({
        $('.rightColumn').prepend(this.el);
    }
 });
+/* Just right this way.
 var LogInView = Parse.View.extend({
     template: $('#template-logInView').html(),
     initialize: function(){
@@ -210,6 +211,7 @@ var SignUpView = Parse.View.extend({
         app.logInView = new LogInView();   
     }
 });
+*/
 var AppView = Parse.View.extend({
     initialize: function() {
 		this.render();
@@ -263,7 +265,7 @@ var Router = Parse.Router.extend({
 		"best/:period": "getBest",
 		"login": "login",
         "myRules" : "myRules",
-        "logout": "logout"
+        "logout": "logout"	
 	},
 	initialize: function() {},
 	index: function() {
