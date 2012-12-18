@@ -136,6 +136,7 @@ var RulesNav = Parse.View.extend({
    }
 });
 
+// Here I compile the way the welcoming page is shown.
 var LogInView = Parse.View.extend({
     template: $('#template-logInView').html(),
     initialize: function(){
@@ -149,7 +150,7 @@ var LogInView = Parse.View.extend({
 		"click #loginFB": "login",
 		"click #loginTw": "login",	// For future coding
 		"click #loginVK": "login",	// For future coding
-        "click #signupView": "signupView"
+        "click #signUp": "signupView"
 	},
 	goOnEnter: function(e) {
 		if(e.keyCode == 13) this.login();
