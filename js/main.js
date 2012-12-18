@@ -178,16 +178,12 @@ var LogInView = Parse.View.extend({
 var SignUpView = Parse.View.extend({
     template: $('#template-signUp').html(),
     events: {
-		"click #signupbutton": "signup",
-		"keypress #password": "goOnEnter",
+		"click #signUp": "signup",
         "click #loginView": "loginView"
 	},
     initialize: function(){
         this.render();
     },
-    goOnEnter: function(e) {
-		if(e.keyCode == 13) this.signup();
-	},
     render: function() {
         this.$el.html(this.template);
         $('.firstLeft').html(this.el);
@@ -293,6 +289,7 @@ var Router = Parse.Router.extend({
 		  success: function(user) {
 		    if (!user.existed()) {
 		      alert("Пользователь подписался и вошёл с помощью Facebook!");
+		      console.log(user);
 		    } else {
 		      alert("Пользователь вошёл с помощью Facebook!");
 		    }
