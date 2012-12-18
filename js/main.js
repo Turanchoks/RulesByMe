@@ -289,9 +289,9 @@ var Router = Parse.Router.extend({
 		  success: function(user) {
 		    if (!user.existed()) {
 		      alert("Пользователь подписался и вошёл с помощью Facebook!");
-		      console.log(user);
 		    } else {
 		      alert("Пользователь вошёл с помощью Facebook!");
+		      console.log(user);
 		    }
 		  },
 		  error: function(user, error) {	
