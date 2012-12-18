@@ -146,7 +146,9 @@ var LogInView = Parse.View.extend({
         $('.firstLeft').html(this.el);
     },
     events: {
-		"click #loginbutton": "login",
+		"click #loginFB": "login",
+		"click #loginTw": "login",	// For future coding
+		"click #loginVK": "login",	// For future coding
 		"keypress #password": "goOnEnter",
         "click #signupView": "signupView"
 	},
@@ -171,6 +173,8 @@ var LogInView = Parse.View.extend({
         app.signUpView = new SignUpView();   
     }
 });
+
+// No new code yet here.
 var SignUpView = Parse.View.extend({
     template: $('#template-signUp').html(),
     events: {
@@ -263,7 +267,7 @@ var Router = Parse.Router.extend({
 		"author/:id": "rulesByAuthor",
 		"about": "about",
 		"best/:period": "getBest",
-		"login": "logIn",
+		"loginFB": "logInFB",
         "myRules" : "myRules",
         "logout": "logOut"	
 	},
@@ -284,7 +288,7 @@ var Router = Parse.Router.extend({
     },
 	oneRule: function(id) {},
 	about: function() {},
-	logIn: function () {
+	logInFB: function () {
 		Parse.FacebookUtils.logIn(null, {
 		  success: function(user) {
 		    if (!user.existed()) {
