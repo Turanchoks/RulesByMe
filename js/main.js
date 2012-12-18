@@ -157,14 +157,14 @@ var LogInView = Parse.View.extend({
 	},
 	login: function(e) {
 		var self = this;
-		Parse.User.logIn($("#email").val(), $("#password").val(), {
-			success: function(user) {
+		// Parse.User.logIn($("#email").val(), $("#password").val(), {
+			// success: function(user) {
                 self.remove();
                 app.submitRule = new SubmitRuleView();
-			},
-			error: function(user, error) {
-				console.warn(user, error);
-			}
+			// },
+			// error: function(user, error) {
+			// 	console.warn(user, error);
+			// }
 		});
 	},
     signupView: function() {
