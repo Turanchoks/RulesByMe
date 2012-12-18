@@ -291,12 +291,10 @@ var Router = Parse.Router.extend({
 		      alert("Пользователь подписался и вошёл с помощью Facebook!");
 		    } else {
 		      alert("Пользователь вошёл с помощью Facebook!");
-		      console.log(user);
 		    }
 		  },
 		  error: function(user, error) {	
 		    alert("Пользователь отменил взод при помощи Facebook или неполностью авторизировался.");
-		    console.log(user);
 		  }
 		});
 	},
