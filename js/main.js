@@ -135,7 +135,7 @@ var RulesNav = Parse.View.extend({
        $('.rightColumn').prepend(this.el);
    }
 });
-/* Just right this way.
+
 var LogInView = Parse.View.extend({
     template: $('#template-logInView').html(),
     initialize: function(){
@@ -211,7 +211,7 @@ var SignUpView = Parse.View.extend({
         app.logInView = new LogInView();   
     }
 });
-*/
+
 var AppView = Parse.View.extend({
     initialize: function() {
 		this.render();
@@ -263,9 +263,9 @@ var Router = Parse.Router.extend({
 		"author/:id": "rulesByAuthor",
 		"about": "about",
 		"best/:period": "getBest",
-		"login": "login",
+		"login": "logIn",
         "myRules" : "myRules",
-        "logout": "logout"	
+        "logout": "logOut"	
 	},
 	initialize: function() {},
 	index: function() {
@@ -284,7 +284,7 @@ var Router = Parse.Router.extend({
     },
 	oneRule: function(id) {},
 	about: function() {},
-	login: function () {
+	logIn: function () {
 		Parse.FacebookUtils.logIn(null, {
 		  success: function(user) {
 		    if (!user.existed()) {
@@ -298,7 +298,7 @@ var Router = Parse.Router.extend({
 		  }
 		});
 	},
-    logout: function() {
+    logOut: function() {
         Parse.User.logOut();
         app.submitRule.remove();
         app.logInView = new LogInView();
