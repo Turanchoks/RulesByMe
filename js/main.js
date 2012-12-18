@@ -165,7 +165,7 @@ var LogInView = Parse.View.extend({
 			// error: function(user, error) {
 			// 	console.warn(user, error);
 			// }
-		});
+		// });
 	},
     signupView: function() {
         if(app.logInView) 
