@@ -254,14 +254,6 @@ function queryRules(condition, userId) {
 ////////////
 // ROUTER //
 ////////////
-console.log(Parse.FacebookUtils.init({
-    appId      : '452789981444955', // App ID from the App Dashboard
-    channelUrl : 'http://rulesby.me/RulesByMe/channel.html', // Channel File for x-domain communication
-    status     : true, // check the login status upon init?
-    cookie     : true, // set sessions cookies to allow your server to access the session?
-    xfbml      : true  // parse XFBML tags on this page?
-  }));
-
 var Router = Parse.Router.extend({
     routes: {
 		"": "index",
