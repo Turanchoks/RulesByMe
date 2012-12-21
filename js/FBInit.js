@@ -1,6 +1,6 @@
 window.fbAsyncInit = function() {
   // init the FB JS SDK
-  Parse.FacebookUtils.init({
+  FB.init({
     appId      : '452789981444955', // App ID from the App Dashboard
     channelUrl : 'http://rulesby.me/RulesByMe/channel.html', // Channel File for x-domain communication
     status     : true, // check the login status upon init?
