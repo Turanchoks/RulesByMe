@@ -1,0 +1,26 @@
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<!-- FB init -->
+    <div id="fb-root"></div>
+    <script src="js/FBInit.js"></script>
+
+    <!-- Recieving signedRequest -->    
+    <div id='guy'>
+
+    </div>
+	<fb:login-button registration-url="https://developers.facebook.com/docs/plugins/registration" />
+    <!-- Introducing signedRequest -->
+    <script type="text/javascript">
+    	FB.getLoginStatus(function(response) {
+			if (response.status === 'connected') {
+				var signedRequest = response.authResponse.signedRequest;
+			}
+			var guy = document.getElementById('guy');
+			guy.innerHTML = signedRequest;
+		});
+    </script>
+</body>
+</html>
