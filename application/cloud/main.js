@@ -74,7 +74,7 @@ Parse.Cloud.define("addRule", function(request, response) {
 	});
 });
 
-Parse.Cloud.define("regFB", function () {
+Parse.Cloud.define("DOregFB", function () {
     // FB.login(function(response) {
     //     if (response.authResponse) {
     //         // connected
