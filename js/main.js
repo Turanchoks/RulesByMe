@@ -240,22 +240,23 @@ function login (event) {
 	$('#login-modal').modal('hide');
 	switch(event.data.type) {
 		case "facebook":
-			Parse.FacebookUtils.logIn("user_likes,email", {
-			  success: function(user) {
-			    if (!user.existed()) {
-			      alert("Пользователь подписался и вошёл с помощью Facebook!");
-			    } else {
-			      alert("Пользователь вошёл с помощью Facebook!")
-			     }
-			        app.submitRule.render();
-		    		app.navBar.render();
-		    		app.rulesNav.render();
-			  },
-			  error: function(user, error) {
-			  	$('#login-modal').modal('hide');	
-			    alert("Пользователь отменил вход при помощи Facebook или не полностью авторизовался.");
-			  }
-			});
+			console.log('Hello, FB');
+			// Parse.FacebookUtils.logIn("user_likes,email", {
+			//   success: function(user) {
+			//     if (!user.existed()) {
+			//       alert("Пользователь подписался и вошёл с помощью Facebook!");
+			//     } else {
+			//       alert("Пользователь вошёл с помощью Facebook!")
+			//      }
+			//         app.submitRule.render();
+		 //    		app.navBar.render();
+		 //    		app.rulesNav.render();
+			//   },
+			//   error: function(user, error) {
+			//   	$('#login-modal').modal('hide');	
+			//     alert("Пользователь отменил вход при помощи Facebook или не полностью авторизовался.");
+			//   }
+			// });
 			break;
 		case "twitter":
 			

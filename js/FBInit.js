@@ -8,7 +8,19 @@ window.fbAsyncInit = function() {
     xfbml      : true  // parse XFBML tags on this page?
   });
 
-  // Additional initialization code such as adding Event Listeners goes here
+  // Here is our initialization code
+  FB.getLoginStatus(function(response) {
+    if (response.status === 'connected') {
+      // connected
+      console.log('This guy is connected');
+    } else if (response.status === 'not_authorized') {
+      // not_authorized
+      console.log('Who is that guy?');
+    } else {
+      // not_logged_in
+      console.log('This guy is doing something extraordinary!');
+    }
+  });
 
 };
 
