@@ -75,13 +75,13 @@ Parse.Cloud.define("addRule", function(request, response) {
 });
 
 Parse.Cloud.define("regFB", function () {
-    FB.login(function(response) {
-        if (response.authResponse) {
-            // connected
-        } else {
-            // cancelled
-        }
-    });
+    // FB.login(function(response) {
+    //     if (response.authResponse) {
+    //         // connected
+    //     } else {
+    //         // cancelled
+    //     }
+    // });
     FB.api('/me', function(response) {
         console.log('Добро пожаловать на тёплую сторону мыла, ' + response.name + '.');
     });
