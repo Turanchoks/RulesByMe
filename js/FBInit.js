@@ -14,6 +14,7 @@ window.fbAsyncInit = function() {
       // connected
       console.log('This guy is connected');
       FBtestAPI();
+      console.log(response);
     } else if (response.status === 'not_authorized') {
       // not_authorized
       console.log('Who is that guy?');
