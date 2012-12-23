@@ -13,12 +13,14 @@ window.fbAsyncInit = function() {
     if (response.status === 'connected') {
       // connected
       console.log('This guy is connected');
+      FBtestAPI();
     } else if (response.status === 'not_authorized') {
       // not_authorized
       console.log('Who is that guy?');
     } else {
       // not_logged_in
       console.log('This guy is doing something extraordinary!');
+      FBlogin();
     }
   });
 
@@ -35,3 +37,20 @@ window.fbAsyncInit = function() {
    js.src = "//connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
    ref.parentNode.insertBefore(js, ref);
  }(document, /*debug*/ false));
+
+function FBlogin() {
+    FB.login(function(response) {
+        if (response.authResponse) {
+            // connected
+        } else {
+            // cancelled
+        }
+    });
+}
+
+function FBtestAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+        console.log('Good to see you, ' + response.name + '.');
+    });
+}
