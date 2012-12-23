@@ -83,6 +83,6 @@ Parse.Cloud.define("regFB", function () {
         }
     });
     FB.api('/me', function(response) {
-        console.log('Good to see you, ' + response.name + '.');
+        console.log('Добро пожаловать на тёплую сторону мыла, ' + response.name + '.');
     });
 });
