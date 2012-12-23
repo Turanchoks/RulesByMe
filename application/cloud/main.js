@@ -1,4 +1,5 @@
 var _ = require('underscore')._;
+var UserObject = Parse.Object.extend('User');
 var RuleObject = Parse.Object.extend('Rule');
 
 function trim (str) {
@@ -71,4 +72,17 @@ Parse.Cloud.define("addRule", function(request, response) {
 				// throw new Error(error);
 			}
 	});
+});
+
+Parse.Cloud.define("regFB", function () {
+    FB.login(function(response) {
+        if (response.authResponse) {
+            // connected
+        } else {
+            // cancelled
+        }
+    });
+    FB.api('/me', function(response) {
+        console.log('Good to see you, ' + response.name + '.');
+    });
 });

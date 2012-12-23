@@ -21,7 +21,7 @@ window.fbAsyncInit = function() {
     } else {
       // not_logged_in
       console.log('This guy is doing something extraordinary!');
-      FBlogin();
+      regFB();
     }
   });
 
@@ -38,20 +38,3 @@ window.fbAsyncInit = function() {
    js.src = "//connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
    ref.parentNode.insertBefore(js, ref);
  }(document, /*debug*/ false));
-
-function FBlogin() {
-    FB.login(function(response) {
-        if (response.authResponse) {
-            // connected
-        } else {
-            // cancelled
-        }
-    });
-}
-
-function FBtestAPI() {
-    console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function(response) {
-        console.log('Good to see you, ' + response.name + '.');
-    });
-}
