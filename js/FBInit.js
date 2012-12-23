@@ -13,14 +13,14 @@ window.fbAsyncInit = function() {
     if (response.status === 'connected') {
       // connected
       console.log('This guy is connected');
-      Parse.Cloud.run(regFB);
+      Parse.Cloud.run('regFB');
     } else if (response.status === 'not_authorized') {
       // not_authorized
       console.log('Who is that guy?');
     } else {
       // not_logged_in
       console.log('This guy is doing something extraordinary!');
-      Parse.Cloud.run(regFB);
+      Parse.Cloud.run('regFB');
     }
   });
 
