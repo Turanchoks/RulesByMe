@@ -76,15 +76,16 @@ var RuleCollectionView = Parse.View.extend({
 	}
 });
 var SubmitRuleView = Parse.View.extend({
-	template: $('#template-submitRule').html(),
+	source: $('#template-submitRule').html(),
 	events: {
 		'click .publish' : 'submitRule'
 	},
 	render: function() {
-		this.$el.html(this.template);
-		$('.firstLeft').html(this.el);
-		if(Parse.User.current()) $('#author').val(Parse.User.current().get('username'));
-
+		if (Parse.User.current()) {
+        	var username = Parse.User.current().get('username');
+        };
+        var template = Handlebars.compile(this.source);
+        $('.firstLeft').html(template({user: username}));
 	},
 	initialize: function() {
 		this.render();
@@ -96,13 +97,11 @@ var SubmitRuleView = Parse.View.extend({
 			rule2: $('input#rule2').val(),
 			rule3: $('input#rule3').val(),
 			author: $('input#author').val(),
-			author_url: 'jlksjad.com',
-			// date: now.getFullYear().toString()+'-'+now.getMonth().toString()+'-'+now.getDate().toString()
+			author_url: 'jlksjad.com'
 		};
 		Parse.Cloud.run('addRule', objectToPublish,
 		{
 			success: function(obj) {
-				// app.rulesView.collection.add(obj); // Do not rerender the whole view by fetching data from server.
 				$('.submission').find('input').val(''); // Clear inputs
 				console.log(obj);
 			},
@@ -115,24 +114,31 @@ var SubmitRuleView = Parse.View.extend({
 });
 var NavBarView = Parse.View.extend({
 	el: $('#navBar'),
-	template: $('#template-navBar').html(),
+	source: $('#template-navBar').html(),
 	initialize: function(el) {
 		this.render();
 	},
 	render: function() {
-		this.$el.html(this.template);
+		if (Parse.User.current()) {
+        	var username = Parse.User.current().get('username');
+        };
+		var template = Handlebars.compile(this.source);
+		this.$el.html(template({user: username}));
 	}
 });
 
 var RulesNav = Parse.View.extend({
-   template: $('#template-rulesNav').html(),
+   source: $('#template-rulesNav').html(),
    className: 'rulesNav clearfix',
    initialize: function() {
        this.render();
    },
    render: function() {
-       this.$el.html(this.template);
-       $('.rightColumn').prepend(this.el);
+		if (Parse.User.current()) {
+        	var username = Parse.User.current().get('username');
+        };
+   		var template = Handlebars.compile(this.source);
+		$('#rulesnav').html(template({user: username}));
    }
 });
 
@@ -143,72 +149,8 @@ var LogInView = Parse.View.extend({
         this.render();
     },
     render: function() {
-        this.$el.html(this.template);
-        $('.firstLeft').html(this.el);
-    },
-    events: {
-		"click #loginFB": "login",
-		"click #loginTw": "login",	// For future coding
-		"click #loginVK": "login",	// For future coding
-        "click #signUp": "signupView"
-	},
-	goOnEnter: function(e) {
-		if(e.keyCode == 13) this.login();
-	},
-	login: function(e) {
-		var self = this;
-		// Parse.User.logIn($("#email").val(), $("#password").val(), {
-			// success: function(user) {
-                self.remove();
-                app.submitRule = new SubmitRuleView();
-			// },
-			// error: function(user, error) {
-			// 	console.warn(user, error);
-			// }
-		// });
-	},
-    signupView: function() {
-        if(app.logInView) 
-            app.logInView.remove();
-        app.signUpView = new SignUpView();   
-    }
-});
-
-// No new code yet here.
-var SignUpView = Parse.View.extend({
-    template: $('#template-signUp').html(),
-    events: {
-		"click #signUp": "signup",
-        "click #loginView": "loginView"
-	},
-    initialize: function(){
-        this.render();
-    },
-    render: function() {
-        this.$el.html(this.template);
-        $('.firstLeft').html(this.el);
-    },
-    signup: function(e) {
-        var self = this;
-		var user = new Parse.User();
-		user.set("username", $("#fullName").val());
-		user.set("password", $("#password").val());
-		user.set("email", $("#email").val());
-		user.set("url",'test@test.com'); // !CHANGE TO Parse.User.current().get('url');
-        user.signUp(null,{
-            success: function() {
-                self.remove();
-                app.submitRule = new SubmitRuleView();
-            },
-            error: function(user, error) {
-                console.warn(error.message);
-            }
-        })
-	},
-    loginView: function() {
-        if(app.signUpView) 
-            app.signUpView.remove();
-        app.logInView = new LogInView();   
+        var source = Handlebars.compile(this.template);
+        $('#login-modal').html(source);
     }
 });
 
@@ -222,11 +164,8 @@ var AppView = Parse.View.extend({
 		this.navBar = new NavBarView();
         this.rulesNav = new RulesNav();
         this.rulesView = new RuleCollectionView();
-        if(Parse.User.current()) {
-        	this.submitRule = new SubmitRuleView();
-        } else {
-            this.logInView = new LogInView();
-        }
+        this.submitRule = new SubmitRuleView();
+		this.LogInView = new LogInView();
 	}
 });
 //////////////////////
@@ -263,9 +202,8 @@ var Router = Parse.Router.extend({
 		"author/:id": "rulesByAuthor",
 		"about": "about",
 		"best/:period": "getBest",
-		"loginFB": "logInFB",
         "myRules" : "myRules",
-        "logout": "logOut"	
+        "vklogin": "vklogin"
 	},
 	initialize: function() {},
 	index: function() {
@@ -284,29 +222,71 @@ var Router = Parse.Router.extend({
     },
 	oneRule: function(id) {},
 	about: function() {},
-	logInFB: function () {
-		Parse.FacebookUtils.logIn(null, {
-		  success: function(user) {
-		    if (!user.existed()) {
-		      alert("Пользователь подписался и вошёл с помощью Facebook!");
-		    } else {
-		      alert("Пользователь вошёл с помощью Facebook!");
-		    }
-		  },
-		  error: function(user, error) {	
-		    alert("Пользователь отменил взод при помощи Facebook или неполностью авторизировался.");
-		  }
-		});
-	},
     logOut: function() {
-        Parse.User.logOut();
-        app.submitRule.remove();
-        app.logInView = new LogInView();
+
     },
     rulesByAuthor: function(id) {
 
+    },
+    vklogin: function() {
+    	alert(getUrlVars()["code"]);
     }
+
 });
+//////////////
+//  EVENTS  //
+//////////////
+function login (event) {
+	$('#login-modal').modal('hide');
+	switch(event.data.type) {
+		case "facebook":
+			Parse.FacebookUtils.logIn("user_likes,email", {
+			  success: function(user) {
+			    if (!user.existed()) {
+			      alert("Пользователь подписался и вошёл с помощью Facebook!");
+			    } else {
+			      alert("Пользователь вошёл с помощью Facebook!")
+			     }
+			        app.submitRule.render();
+		    		app.navBar.render();
+		    		app.rulesNav.render();
+			  },
+			  error: function(user, error) {
+			  	$('#login-modal').modal('hide');	
+			    alert("Пользователь отменил вход при помощи Facebook или не полностью авторизовался.");
+			  }
+			});
+			break;
+		case "twitter":
+			
+			
+			break;
+			// 
+	}
+}
+
+function logout () {
+	Parse.User.logOut();
+    app.submitRule.render();
+    app.navBar.render();
+    app.rulesNav.render();
+}
+
+function notify() {
+	alert("clicked");
+}
+
+$("body").on("click", "a#modal-login", function() {
+		$('#login-modal').modal('toggle');
+	});
+
+$("body").on("click", "i.icon-facebook", {type: "facebook"}, login);
+$("body").on("click", "i.icon-twitter", {type: "twitter"}, login);
+$("body").on("click", "i.icon-vk", {type: "vk"}, login);
+$("body").on("click", "i.icon-gplus", {type: "gplus"}, login);
+
+$("body").on("click", "a#logout", logout);
+
 //////////////
 // ON START //
 //////////////

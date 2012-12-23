@@ -18,6 +18,7 @@
         </style>
         <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
         <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/fontello.css">
         <script src="js/vendor/modernizr-2.6.1-respond-1.1.0.min.js"></script>
     </head>
     <body>
@@ -35,17 +36,22 @@
                     <div class="secondLeft"></div>
                 </div>
                 <div class="span6 rightColumn">
-                    <div class="head"></div>
+                    <div class="head rulesNav">
+                        <div class="clearfix" id="rulesnav">
+                        </div>
+                    </div>
                     <ul id="rulesList"></ul>
                 </div>                
             </div>
         </div>
+        <div id="login-modal" class="modal hide fade"></modal>
         
-        <footer class="footer">
+<!--         <footer class="footer">
             <div class="container">
                 <p>&copy; Company 2012</p>
             </div>
-        </footer>
+        </footer> -->
+
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
         <script src="js/vendor/bootstrap.min.js"></script>
         <script type="text/javascript" src="js/parse.js"></script>
@@ -77,11 +83,12 @@
             </div>
         </script>
 
-        <script type="text/template" id="template-submitRule">
+        <script type="text/x-handlebars-template" id="template-submitRule">
             <h1>Добавить свои правила</h1>
             <div class="submission">
                 <div class="input-prepend control-group">
-                    <span class="add-on">Rules by</span><input type="text" id='author'>
+                    <span class="add-on">Rules by</span>
+                    <input type="text" id='author' value='{{user}}'>
                 </div>
                 <div class="input-prepend control-group">
                     <span class="add-on">1</span><input type="text" id='rule1'>
@@ -93,19 +100,26 @@
                     <span class="add-on">3</span><input type="text" id='rule3'>
                 </div>                        
             </div>
-            <a class="btn btn-large btn-warning publish">ОПУБЛИКОВАТЬ</a>
+            {{#if user}}
+                <a class="btn btn-large btn-warning publish">ОПУБЛИКОВАТЬ</a>
+            {{else}}
+                <a class="btn btn-large btn-warning modal-login">ВОЙТИ И ОПУБЛИКОВАТЬ</a>
+            {{/if}}
         </script>
 
-        <script type="text/template" id="template-rulesNav">
+        <script type="text/x-handlebars-template" id="template-rulesNav">
+            <div class="span2"><a href="#last">Последние</a></div>
             <div class="span2"><a href="#best/week">Лучшие недели</a></div>
             <div class="span2"><a href="#best/month">Лучшие месяца</a></div>
-            <div class="span2"><a href="#myRules">Мои правила</a></div>
+            {{#if user}}
+                <div class="span2"><a href="#myRules">Мои правила</a></div>
+            {{/if}}
         </script>
 
-        <script type="text/template" id="template-navBar">
+        <script type="text/x-handlebars-template" id="template-navBar">
             <div class="navbar navbar-inverse navbar-fixed-top">
                 <div class="navbar-inner">
-                    <div class="container">
+                    <div class="container-fluid">
                         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
@@ -117,32 +131,46 @@
                                 <li class="active"><a href="#">Home</a></li>
                                 <li><a href="#about">About</a></li>
                                 <li><a href="#contact">Contact</a></li>
-                                <li><a href="#logout">Logout</a></li>
+                            </ul>
+                            <ul class="nav pull-rigth">
+                                {{#if user}}
+                                    <li><a href="#" id="logout">Logout</a></li>
+                                {{else}}
+                                    <li><a href="#" id="modal-login">Login</a></li>
+                                {{/if}}
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
         </script>
+
         <script type = "text/template" id="template-gifLoader">
             <div class="loading"><img src="img/ajax-loader.gif"/></div>
         </script>
         
-        <script type="text/template" id="template-logInView">
-            <p><a href="#loginFB" id="loginFB">Login FB</a> or <button type="button" class="btn" id="signUp">sign up</button></p>
+        <script type="text/x-handlebars-template" id="template-logInView">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>Авторизация</h3>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Войти с помощью
+                    <a href="#" class="nounderline"><i class="icon-facebook"></i></a>
+                    <a href="#" class="nounderline"><i class="icon-twitter"></i><a>
+                    <a href="https://oauth.vk.com/authorize?client_id=3313840&redirect_uri=http://rulesby.me/RulesByMe/close.html&response_type=token&scope=12&display=page" class="nounderline"><i class="icon-vk"></i></a>
+                    <a href="#" class="nounderline"><i class="icon-gplus"></i><a>
+                </p>
+            </div>
         </script>
 
-        <script type="text/template" id="template-signUp">
-            <p><label>name: </label><input type="text" name="fullName" id="fullName" /></p>
-            <p><label>email: </label><input type="text" name="email" id="email" /></p>
-            <p><label>password: </label><input type="password" name="password" id="password"/></p>
-            <p><a href="#login" id="loginView">Login</a> or <button type="button" class="btn" id="signUp">sign up</button></p>
-        </script>
+        <!-- Handlebars init -->
+        <script type="text/javascript" src="js/handlebars.js"></script>
         <!-- Parse init -->
         <script type="text/javascript" src="js/main.js"></script>
         <!-- FB init -->
-            <div id="fb-root"></div>
-            <script src="js/FBInit.js"></script>
-        
+        <div id="fb-root"></div>
+        <script src="js/FBInit.js"></script>
     </body>
 </html>
