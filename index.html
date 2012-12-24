@@ -90,7 +90,7 @@
             <div class="submission">
                 <div class="input-prepend control-group">
                     <span class="add-on">Rules by</span>
-                    <input type="text" id='author' value='{{user}}'>
+                    <input type="text" id='author' value='{{get_username}}'>
                 </div>
                 <div class="input-prepend control-group">
                     <span class="add-on">1</span><input type="text" id='rule1'>
@@ -102,20 +102,13 @@
                     <span class="add-on">3</span><input type="text" id='rule3'>
                 </div>                        
             </div>
-            {{#if user}}
-                <a class="btn btn-large btn-warning publish">ОПУБЛИКОВАТЬ</a>
-            {{else}}
-                <a class="btn btn-large btn-warning modal-login">ВОЙТИ И ОПУБЛИКОВАТЬ</a>
-            {{/if}}
+            {{submit_button}}
         </script>
 
         <script type="text/x-handlebars-template" id="template-rulesNav">
             <div class="span2"><a href="#last">Последние</a></div>
             <div class="span2"><a href="#best/week">Лучшие недели</a></div>
             <div class="span2"><a href="#best/month">Лучшие месяца</a></div>
-            {{#if user}}
-                <div class="span2"><a href="#myRules">Мои правила</a></div>
-            {{/if}}
         </script>
 
         <script type="text/x-handlebars-template" id="template-navBar">
@@ -135,11 +128,7 @@
                                 <li><a href="#contact">Contact</a></li>
                             </ul>
                             <ul class="nav pull-rigth">
-                                {{#if user}}
-                                    <li><a href="#" id="logout">Logout</a></li>
-                                {{else}}
-                                    <li><a href="#" id="modal-login">Login</a></li>
-                                {{/if}}
+                                {{navbar_login}}
                             </ul>
                         </div>
                     </div>

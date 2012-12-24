@@ -81,11 +81,8 @@ var SubmitRuleView = Parse.View.extend({
 		'click .publish' : 'submitRule'
 	},
 	render: function() {
-		if (Parse.User.current()) {
-        	var username = Parse.User.current().get('username');
-        };
         var template = Handlebars.compile(this.source);
-        $('.firstLeft').html(template({user: username}));
+        $('.firstLeft').html(template());
 	},
 	initialize: function() {
 		this.render();
@@ -119,11 +116,8 @@ var NavBarView = Parse.View.extend({
 		this.render();
 	},
 	render: function() {
-		if (Parse.User.current()) {
-        	var username = Parse.User.current().get('username');
-        };
 		var template = Handlebars.compile(this.source);
-		this.$el.html(template({user: username}));
+		this.$el.html(template());
 	}
 });
 
@@ -134,11 +128,8 @@ var RulesNav = Parse.View.extend({
        this.render();
    },
    render: function() {
-		if (Parse.User.current()) {
-        	var username = Parse.User.current().get('username');
-        };
    		var template = Handlebars.compile(this.source);
-		$('#rulesnav').html(template({user: username}));
+		$('#rulesnav').html(template());
    }
 });
 
@@ -192,6 +183,33 @@ function queryRules(condition, userId) {
 	}
 	return query.collection();
 }
+
+Handlebars.registerHelper('submit_button', function() {
+    if (Parse.User.current()) {
+        return new Handlebars.SafeString("<a class=\"btn btn-large btn-warning publish\">ОПУБЛИКОВАТЬ</a>");	
+    }
+    else {
+        return new Handlebars.SafeString("<a class=\"btn btn-large btn-warning modal-login\">ВОЙТИ И ОПУБЛИКОВАТЬ</a>");
+    }
+});
+
+Handlebars.registerHelper('get_username', function() {
+    if (Parse.User.current()) {
+        return new Handlebars.SafeString(Parse.User.current().get('username'));	
+    }
+    else {
+        return new Handlebars.SafeString("");
+    }
+});
+
+Handlebars.registerHelper('navbar_login', function() {
+    if (Parse.User.current()) {
+        return new Handlebars.SafeString("<li><a href=\"#\" id=\"logout\">Logout</a></li>");	
+    }
+    else {
+        return new Handlebars.SafeString("<li><a href=\"#\" id=\"modal-login\">Login</a></li>");
+    }
+});
 ////////////
 // ROUTER //
 ////////////
@@ -202,8 +220,7 @@ var Router = Parse.Router.extend({
 		"author/:id": "rulesByAuthor",
 		"about": "about",
 		"best/:period": "getBest",
-        "myRules" : "myRules",
-        "vklogin": "vklogin"
+        "myRules" : "myRules"
 	},
 	initialize: function() {},
 	index: function() {
@@ -227,11 +244,7 @@ var Router = Parse.Router.extend({
     },
     rulesByAuthor: function(id) {
 
-    },
-    vklogin: function() {
-    	alert(getUrlVars()["code"]);
     }
-
 });
 //////////////
 //  EVENTS  //
