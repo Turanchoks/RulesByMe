@@ -2,6 +2,24 @@ var _ = require('underscore')._;
 var UserObject = Parse.Object.extend('User');
 var RuleObject = Parse.Object.extend('Rule');
 
+// THE SINGUP CODE NOT WORKING ON PARSE CLOUD
+// var user = new Parse.User();
+// user.set("username", uid);
+// user.set("password", "12345");
+// user.set("vkData", uid);
+// user.signUp(null, {
+// 	success: function(user) {
+// 		console.log("Registred");
+// 	},
+// 	error: function(user, error) {
+// 		console.error("Error: " + error.code + " " + error.message)
+// 	}
+// });
+
+//////////////
+//  HELPER  //
+//////////////
+
 function trim (str) {
 	str = str.replace(/^\s+/, '');
 	for (var i = str.length - 1; i >= 0; i--) {
@@ -11,6 +29,15 @@ function trim (str) {
 		}
 	}
 	return str;
+}
+
+//////////////
+//    VK    //
+//////////////
+
+function vklogin (uid, access_token) {
+	console.log("uid= "+ uid + " token = " + access_token);
+
 }
 
 Parse.Cloud.define("ratingChange", function(request, response) {
@@ -86,3 +113,62 @@ Parse.Cloud.define("regFB", function () {
         console.log('Добро пожаловать на тёплую сторону мыла, ' + response.name + '.');
     });
 });
+
+Parse.Cloud.define("vklogin", function(request, response) {
+	Parse.Cloud.httpRequest({
+			url: 'https://oauth.vk.com/access_token',
+			params: {
+				client_id: '3313840',
+				client_secret: 'dEBkxtVuUQPAX00CYdli',
+				code: request.params.code,
+				redirect_uri: 'http://rulesby.me/RulesByMe/close.html'
+			},
+			success: function(httpResponse) {
+					// console.log(httpResponse.data);
+					Parse.Cloud.httpRequest({
+						url: 'https://api.vk.com/method/users.get',
+						params: {
+							uids: httpResponse.data.user_id,
+							access_token: httpResponse.data.access_token
+						},
+						success: function(httpResponse) {
+							var uid = httpResponse.data.response[0].uid;
+
+							var qSearchVK = new Parse.Query('User');
+							qSearchVK.equalTo("vkData", uid);
+							qSearchVK.find({
+								success: function(User) {
+									console.log(User.length);
+									if(!User.length) {
+										var user = {
+											username: "http://vk.com/id" + uid,
+											password: "test",
+											vkData: uid
+										}
+										response.success(user);
+									}
+								},
+								error: function() {
+
+								}
+							});
+							
+						},
+						error: function(httpResponse) {
+							console.error('Request failed with response code ' + httpResponse.status);
+							response.error("Didn't get vk data");
+						}
+					});
+			},
+			error: function(httpResponse) {
+				console.error('Request failed with response code ' + httpResponse.status);
+				response.error("Didn't get vk token");
+			}
+	});
+});
+
+// Vklogin 
+// 1. make from receive code access_token
+// 2. pass access_token to get user_id
+// 3. check if we had user with same user_id
+// 4. if(3) then login else signup
