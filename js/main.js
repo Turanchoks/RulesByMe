@@ -269,7 +269,58 @@ function login (event) {
 			
 			
 			break;
-			// 
+		case "vk":
+			VK.Auth.login(function(response) {
+			  if (response.session) {
+			    	var userid = response.session.mid;
+			    	console.log(response.session);
+
+					var qSearchVK = new Parse.Query('User');
+					qSearchVK.equalTo("username", userid);
+					qSearchVK.find({
+						success: function(User) {
+							// console.log(User.length);
+							if(!User.length) {
+								var newUser = new Parse.User();
+								newUser.set("username", userid);
+								newUser.set("password", "test");
+								newUser.set("vkAuth", {
+									userid: userid,
+									name: response.session.user.first_name + " " + response.session.user.last_name
+								});
+
+								newUser.signUp(null,
+								{
+								success: function(user)	{
+								    app.submitRule.render();
+								    app.navBar.render();
+								    app.rulesNav.render();
+								},
+								error: function(user, error) {
+									// Show the error message somewhere and let the user try again.
+									alert("Error: " + error.code + " " + error.message);
+								}
+								});
+							}
+							else {
+								Parse.User._saveCurrentUser(User[0]);
+								app.submitRule.render();
+								app.navBar.render();
+								app.rulesNav.render();
+							}
+						},
+						error: function() {
+
+					  	}
+						});						
+						}
+					// });
+			  // });
+			  //  else {
+			  // 	}
+			// }
+		});
+		break;
 	}
 }
 
