@@ -265,18 +265,17 @@ function login (event) {
 					    FB.api('/me', function(response) {
 					        userToRegister = {
 								url:		response.link,
-								username: 	response.name,
+								username: 	response.name
 							};
 					    });
 					    Parse.Cloud.run('loginFB', userToRegister, {
-						  //   	success: function(obj) {
-								// 	console.log('Вот это успех!');
-								// },
-								// error: function(error, obj) {
-								// 	console.error('Нас постигла неудача.')
-								// }
-							}
-					    );
+						  		success: function(obj) {
+									console.log('Вот это успех!');
+								},
+								error: function(error, obj) {
+									console.error('Нас постигла неудача.')
+								}
+						});
 			        }
 			        else {
 			            // cancelled
