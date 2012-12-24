@@ -101,10 +101,10 @@ Parse.Cloud.define("addRule", function(request, response) {
 	});
 });
 
-Parse.Cloud.define("loginFB", function (request, response) {
+Parse.Cloud.define('loginFB', function(request, response) {
     var newUserToRegister = new UserObject({
     	url:		request.params.url,
-    	username:	request.params.username,
+    	username:	request.params.username
     });
     newUserToRegister.save({
 		success: function(obj) {
