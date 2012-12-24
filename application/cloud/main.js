@@ -91,13 +91,13 @@ Parse.Cloud.define("addRule", function(request, response) {
 		rating: 0
 	});
 	ruleObjectToPublish.save({
-			success: function(obj) {
-				response.success(obj); 
-			},
-			error: function(error, obj) {
-				response.error(error, obj);
-				// throw new Error(error);
-			}
+		success: function(obj) {
+			response.success(obj); 
+		},
+		error: function(error, obj) {
+			response.error(error, obj);
+			// throw new Error(error);
+		}
 	});
 });
 

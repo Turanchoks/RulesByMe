@@ -258,17 +258,27 @@ function login (event) {
 			// Login function
 			var loginFB = function() {
 				FB.login(function(response) {
+					console.log('Успешное начало функции login')
 					var userToRegister = {};
 			        if (response.authResponse) {
+			            console.log('В проверке authResponce успех')
 			            // connected
 			            // Here I have to add my saving to server method.
 					    FB.api('/me', function(response) {
+					    	console.log('Успешное обращение к FB.api')
 					        userToRegister = {
 								url:		response.link,
 								username: 	response.name,
 							};
 					    });
-					    Parse.Cloud.run('loginFB', userToRegister);
+					    Parse.Cloud.run('loginFB', userToRegister,
+					    	success: function(obj) {
+								console.log('Вот это успех!');
+							},
+							error: function(error, obj) {
+								console.error('Нас постигла неудача.')
+							}
+					    );
 			        }
 			        else {
 			            // cancelled
