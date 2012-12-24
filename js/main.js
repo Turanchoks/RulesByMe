@@ -269,12 +269,12 @@ function login (event) {
 							};
 					    });
 					    Parse.Cloud.run('loginFB', userToRegister, {
-						    	success: function(obj) {
-									console.log('Вот это успех!');
-								},
-								error: function(error, obj) {
-									console.error('Нас постигла неудача.')
-								}
+						  //   	success: function(obj) {
+								// 	console.log('Вот это успех!');
+								// },
+								// error: function(error, obj) {
+								// 	console.error('Нас постигла неудача.')
+								// }
 							}
 					    );
 			        }
