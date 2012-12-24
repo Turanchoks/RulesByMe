@@ -9,22 +9,6 @@ window.fbAsyncInit = function() {
   });
 
   // Here is our initialization code
-  FB.getLoginStatus(function(response) {
-    if (response.status === 'connected') {
-      // connected
-      console.log('This guy is connected');
-    } else if (response.status === 'not_authorized') {
-      // not_authorized
-      console.log('Who is that guy?');
-    } else {
-      // not_logged_in
-      console.log('This guy is doing something extraordinary!');
-      // I've got here to work with login() function. I guess
-      // that the FB.getLoginStatus is going to transfer to the
-      // login() methof in the EVENTS. This is going to be the
-      // checkup if the user is already registered.
-    }
-  });
 
 };
 

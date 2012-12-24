@@ -254,16 +254,37 @@ function login (event) {
 	$('#login-modal').modal('hide');
 	switch(event.data.type) {
 		case "facebook":
-			console.log('Hello, FB');
-			// I've to add here checking if 
-		    FB.login(function(response) {
-		        if (response.authResponse) {
-		            // connected
-		            // Here I have to add my saving to server method.
-		        } else {
-		            // cancelled
-		        }
-		    });
+			// Checking is the guy is logged or not.
+			// Login function
+			var loginFB = function() {
+				FB.login(function(response) {
+			        if (response.authResponse) {
+			            // connected
+			            // Here I have to add my saving to server method.
+			        } else {
+			            // cancelled
+			        }
+			    });
+			};
+		    // Checking function.
+			FB.getLoginStatus(function(response) {
+				if (response.status === 'connected') {
+					// connected
+					console.log('This guy is connected');
+					alert('Да вы уже зашли, сударь!');
+				} else if (response.status === 'not_authorized') {
+					// not_authorized
+					console.log('Да вы хер с горы, сударь!');
+				} else {
+				// not_logged_in
+				console.log('Вам необходимо зарегистрироваться!');
+				loginFB();
+					// I've got here to work with login() function. I guess
+					// that the FB.getLoginStatus is going to transfer to the
+					// login() methof in the EVENTS. This is going to be the
+					// checkup if the user is already registered.
+				}
+			});
 			break;
 		case "twitter":
 			
