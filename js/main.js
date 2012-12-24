@@ -1,7 +1,12 @@
 ////////////
 // CONFIG //
 ////////////
-
+Parse.View = Parse.View.extend({ // change standart behavior of View.remove() to make it detach events
+	remove: function() {
+		this.$el.empty().detach();
+		return this;
+	}
+});
 Parse.initialize("7NWULxIRFzuMWrQ6bX1O8mm357Nz7jfHEWXhPevn", "yQmxvt5eKgJfbSCePpBM040ZUMj3iNHiucWBlpas");
 function dateToString(date) {
 	var trimmedDate = date.getFullYear().toString();
@@ -194,7 +199,7 @@ Handlebars.registerHelper('get_username', function() {
         return new Handlebars.SafeString(Parse.User.current().get('username'));	
     }
     else {
-        return new Handlebars.SafeString("");
+        return "";
     }
 });
 
@@ -297,27 +302,4 @@ var app    = new AppView();
 var router = new Router();
 $(function() {
    Parse.history.start(); 
-});
-
-// NEW
-var positions = document.getElementsByClassName('position');
-var Views = {}; // Object with id's of elements for Views
-for (var i = 0; i < positions.length; i++) {
-	Views[positions[i].getAttribute('id')] = null;
-}
-Parse.View = Parse.View.extend({
-	render: function() {
-		this.$el.html(this.template(this.model.toJSON()));
-	},
-	initialize: function() {
-		this.render();
-		Views[this.el.getAttribute('id')] = this;
-		// this.model.on('change', this.render, this);
-		// this.collection.on('change', this.render, this);
-		// this.collection.on('add', this.render, this);
-	},
-	remove: function() { // change standart behavior of View.remove() to make it detach events
-		this.$el.empty().detach();
-		return this;
-	}
 });
