@@ -82,6 +82,7 @@ var SubmitRuleView = Parse.View.extend({
 	initialize: function() {
 		this.render();
 	},
+	// Can't undestand, why it's here.
 	submitRule : function() {
 		var now = new Date();
 		var objectToPublish = {
@@ -249,22 +250,15 @@ function login (event) {
 	switch(event.data.type) {
 		case "facebook":
 			console.log('Hello, FB');
-			// Parse.FacebookUtils.logIn("user_likes,email", {
-			//   success: function(user) {
-			//     if (!user.existed()) {
-			//       alert("Пользователь подписался и вошёл с помощью Facebook!");
-			//     } else {
-			//       alert("Пользователь вошёл с помощью Facebook!")
-			//      }
-			//         app.submitRule.render();
-		 //    		app.navBar.render();
-		 //    		app.rulesNav.render();
-			//   },
-			//   error: function(user, error) {
-			//   	$('#login-modal').modal('hide');	
-			//     alert("Пользователь отменил вход при помощи Facebook или не полностью авторизовался.");
-			//   }
-			// });
+			// I've to add here checking if 
+		    FB.login(function(response) {
+		        if (response.authResponse) {
+		            // connected
+		            // Here I have to add my saving to server method.
+		        } else {
+		            // cancelled
+		        }
+		    });
 			break;
 		case "twitter":
 			
