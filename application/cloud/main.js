@@ -82,7 +82,7 @@ Parse.Cloud.define("regFB", function () {
     //         // cancelled
     //     }
     // });
-    FB.api('/me', function(response) {
-        console.log('Добро пожаловать на тёплую сторону мыла, ' + response.name + '.');
-    });
+    // FB.api('/me', function(response) {
+    //     console.log('Добро пожаловать на тёплую сторону мыла, ' + response.name + '.');
+    // });
 });
