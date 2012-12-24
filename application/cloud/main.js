@@ -101,17 +101,20 @@ Parse.Cloud.define("addRule", function(request, response) {
 	});
 });
 
-Parse.Cloud.define("regFB", function () {
-    // FB.login(function(response) {
-    //     if (response.authResponse) {
-    //         // connected
-    //     } else {
-    //         // cancelled
-    //     }
-    // });
-    FB.api('/me', function(response) {
-        console.log('Добро пожаловать на тёплую сторону мыла, ' + response.name + '.');
+Parse.Cloud.define("loginFB", function (request, response) {
+    var newUserToRegister = new UserObject({
+    	url:		request.params.url,
+    	username:	request.params.username,
     });
+    newUserToRegister.save({
+		success: function(obj) {
+			response.success(obj); 
+		},
+		error: function(error, obj) {
+			response.error(error, obj);
+			// throw new Error(error);
+		}
+	});
 });
 
 Parse.Cloud.define("vklogin", function(request, response) {

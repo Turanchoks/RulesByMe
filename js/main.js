@@ -258,13 +258,23 @@ function login (event) {
 			// Login function
 			var loginFB = function() {
 				FB.login(function(response) {
+					var userToRegister = {};
 			        if (response.authResponse) {
 			            // connected
 			            // Here I have to add my saving to server method.
-			        } else {
+					    FB.api('/me', function(response) {
+					        userToRegister = {
+								url:		response.link,
+								username: 	response.name,
+							};
+					    });
+					    Parse.Cloud.run('loginFB', userToRegister);
+			        }
+			        else {
 			            // cancelled
 			        }
 			    });
+
 			};
 		    // Checking function.
 			FB.getLoginStatus(function(response) {
