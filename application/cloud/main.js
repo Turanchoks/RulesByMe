@@ -103,7 +103,7 @@ Parse.Cloud.define("addRule", function(request, response) {
 Parse.Cloud.define('registrationFB', function(request, response) {
     var newUserToRegister = new Parse.User({
     	url:		request.params.url,
-    	username:	request.params.username
+    	username:	request.params.username,
     	email:  	'gaga@gaga.com',
     	password: 	'12345'
     });
