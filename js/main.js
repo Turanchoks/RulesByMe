@@ -363,6 +363,64 @@ function login (event) {
 			// }
 		});
 		break;
+		case "gplus": 
+			gapi.client.load('plus', 'v1', function() { 
+				// alert("gplus sdk loaded");
+				var clientId = '923974640051-ht5uitgkdjvl4pmhf4qlm5o22qaad211.apps.googleusercontent.com';
+				var apiKey = 'AIzaSyAM24v0bbMXxesyKUTwoWDpkwfVUv-fcXo';
+				var scopes = 'https://www.googleapis.com/auth/plus.me';
+				gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, function(authResult){
+					// console.log(authResult);
+					var request = gapi.client.plus.people.get({
+          				'userId': 'me'
+            		});
+      				request.execute(function(resp) {
+						// console.log(resp);
+						var userid = resp.id;
+						var name = resp.displayName;
+
+						var qSearchGplus = new Parse.Query('User');
+						qSearchGplus.equalTo("gplusID", userid);
+						qSearchGplus.find({
+							success: function(User) {
+								if(!User.length) {
+									var newUser = new Parse.User();
+									newUser.set("username", userid);
+									newUser.set("password", "test");
+									newUser.set("gplusAuth", {
+										userid: userid,
+										name: name
+									});
+									newUser.set("gplusID", userid);
+
+									newUser.signUp(null,
+									{
+									success: function(user)	{
+									    app.submitRule.render();
+									    app.navBar.render();
+									    app.rulesNav.render();
+									},
+									error: function(user, error) {
+										// Show the error message somewhere and let the user try again.
+										alert("Error: " + error.code + " " + error.message);
+									}
+									});
+								}
+								else {
+									Parse.User._saveCurrentUser(User[0]);
+									app.submitRule.render();
+									app.navBar.render();
+									app.rulesNav.render();
+								}
+							},
+							error: function() {
+
+							}
+						})
+        			});
+				}); 
+			});
+		break;
 	}
 }
 
