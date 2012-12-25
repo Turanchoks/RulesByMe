@@ -1,5 +1,4 @@
 var _ = require('underscore')._;
-var UserObject = Parse.Object.extend('User');
 var RuleObject = Parse.Object.extend('Rule');
 
 // THE SINGUP CODE NOT WORKING ON PARSE CLOUD
@@ -101,10 +100,10 @@ Parse.Cloud.define("addRule", function(request, response) {
 	});
 });
 
-Parse.Cloud.define("loginFB", function (request, response) {
-    var newUserToRegister = new UserObject({
+Parse.Cloud.define('loginFB', function(request, response) {
+    var newUserToRegister = new Parse.User({
     	url:		request.params.url,
-    	username:	request.params.username,
+    	username:	request.params.username
     });
     newUserToRegister.save({
 		success: function(obj) {
