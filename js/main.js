@@ -264,10 +264,13 @@ function login (event) {
 			            // connected
 			            // Here I have to add my saving to server method.
 					    FB.api('/me', function(response) {
-					        userToRegister = {
-								url:		response.link,
-								username: 	response.name
-							};
+					  		//	userToRegister = {
+							// 	url:		response.link,
+							// 	username: 	response.name
+							// };
+							userToRegister.url = response.link;
+							userToRegister.username = response.name;
+
 					    });
 					    Parse.Cloud.run('loginFB', userToRegister, {
 						  		success: function(obj) {
