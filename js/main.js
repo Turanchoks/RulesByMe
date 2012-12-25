@@ -205,6 +205,7 @@ Handlebars.registerHelper('navbar_login', function() {
         return new Handlebars.SafeString("<li><a href=\"#\" id=\"modal-login\">Login</a></li>");
     }
 });
+
 ////////////
 // ROUTER //
 ////////////
@@ -306,24 +307,24 @@ $(function() {
 });
 
 // NEW
-var positions = document.getElementsByClassName('position');
-var Views = {}; // Object with id's of elements for Views
-for (var i = 0; i < positions.length; i++) {
-	Views[positions[i].getAttribute('id')] = null;
-}
-Parse.View = Parse.View.extend({
-	render: function() {
-		this.$el.html(this.template(this.model.toJSON()));
-	},
-	initialize: function() {
-		this.render();
-		Views[this.el.getAttribute('id')] = this;
-		// this.model.on('change', this.render, this);
-		// this.collection.on('change', this.render, this);
-		// this.collection.on('add', this.render, this);
-	},
-	remove: function() { // change standart behavior of View.remove() to make it detach events
-		this.$el.empty().detach();
-		return this;
-	}
-});
+// var positions = document.getElementsByClassName('position');
+// var Views = {}; // Object with id's of elements for Views
+// for (var i = 0; i < positions.length; i++) {
+// 	Views[positions[i].getAttribute('id')] = null;
+// }
+// Parse.View = Parse.View.extend({
+// 	render: function() {
+// 		this.$el.html(this.template(this.model.toJSON()));
+// 	},
+// 	initialize: function() {
+// 		this.render();
+// 		Views[this.el.getAttribute('id')] = this;
+// 		// this.model.on('change', this.render, this);
+// 		// this.collection.on('change', this.render, this);
+// 		// this.collection.on('add', this.render, this);
+// 	},
+// 	remove: function() { // change standart behavior of View.remove() to make it detach events
+// 		this.$el.empty().detach();
+// 		return this;
+// 	}
+// });

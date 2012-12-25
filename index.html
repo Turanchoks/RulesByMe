@@ -46,7 +46,7 @@
                 </div>                
             </div>
         </div>
-        <div id="login-modal" class="modal hide fade"></modal>
+        <div id="login-modal" class="modal hide fade"></div>
         
 <!--         <footer class="footer">
             <div class="container">
@@ -103,6 +103,10 @@
                 </div>                        
             </div>
             {{submit_button}}
+            {{#if Parse.User.current()}}
+            <div>qqq</div>
+            {{/if}}
+            <strong>qweweqrwrqwer</strong>
         </script>
 
         <script type="text/x-handlebars-template" id="template-rulesNav">
