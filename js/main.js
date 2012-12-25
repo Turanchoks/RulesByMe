@@ -272,12 +272,12 @@ function login (event) {
 							userToRegister.username = response.name;
 
 					    });
-					    Parse.Cloud.run('loginFB', userToRegister, {
+					    Parse.Cloud.run('registrationFB', userToRegister, {
 						  		success: function(obj) {
 									console.log('Вот это успех!');
 								},
 								error: function(error, obj) {
-									console.error('Нас постигла неудача.')
+									console.error(error, obj)
 								}
 						});
 			        }
