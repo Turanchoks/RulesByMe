@@ -82,7 +82,7 @@ var SubmitRuleView = Parse.View.extend({
 	},
 	render: function() {
         var template = Handlebars.compile(this.source);
-        $('.firstLeft').html(template());
+        $('.firstLeft').html(template({user: "123"}));
 	},
 	initialize: function() {
 		this.render();
@@ -211,6 +211,21 @@ Handlebars.registerHelper('navbar_login', function() {
         return new Handlebars.SafeString("<li><a href=\"#\" id=\"modal-login\">Login</a></li>");
     }
 });
+
+Handlebars.registerHelper('if', function(conditional, options) {
+	console.log(conditional);
+  if(conditional) {
+    return options.fn(this);
+  } else {
+    return options.inverse(this);
+  }
+});
+
+Handlebars.registerHelper('is_auth', function(conditional, options) {
+	console.log("yap");
+	console.log(options);
+	return true;
+});
 ////////////
 // ROUTER //
 ////////////
@@ -254,55 +269,16 @@ function login (event) {
 	$('#login-modal').modal('hide');
 	switch(event.data.type) {
 		case "facebook":
-			// Checking is the guy is logged or not.
-			// Login function
-			var loginFB = function() {
-				FB.login(function(response) {
-					var userToRegister = {};
-			        if (response.authResponse) {
-			            // connected
-			            // Here I have to add my saving to server method.
-					    FB.api('/me', function(response) {
-					        userToRegister = {
-								url:		response.link,
-								username: 	response.name,
-							};
-					    });
-					    Parse.Cloud.run('loginFB', userToRegister, {
-						  //   	success: function(obj) {
-								// 	console.log('Вот это успех!');
-								// },
-								// error: function(error, obj) {
-								// 	console.error('Нас постигла неудача.')
-								// }
-							}
-					    );
-			        }
-			        else {
-			            // cancelled
-			        }
-			    });
-
-			};
-		    // Checking function.
-			FB.getLoginStatus(function(response) {
-				if (response.status === 'connected') {
-					// connected
-					console.log('This guy is connected');
-					alert('Да вы уже зашли, сударь!');
-				} else if (response.status === 'not_authorized') {
-					// not_authorized
-					console.log('Да вы хер с горы, сударь!');
-				} else {
-				// not_logged_in
-				console.log('Вам необходимо зарегистрироваться!');
-				loginFB();
-					// I've got here to work with login() function. I guess
-					// that the FB.getLoginStatus is going to transfer to the
-					// login() methof in the EVENTS. This is going to be the
-					// checkup if the user is already registered.
-				}
-			});
+			console.log('Hello, FB');
+			// I've to add here checking if 
+		    FB.login(function(response) {
+		        if (response.authResponse) {
+		            // connected
+		            // Here I have to add my saving to server method.
+		        } else {
+		            // cancelled
+		        }
+		    });
 			break;
 		case "twitter":
 			
