@@ -1,6 +1,23 @@
 var _ = require('underscore')._;
-var UserObject = Parse.Object.extend('User');
 var RuleObject = Parse.Object.extend('Rule');
+
+// THE SINGUP CODE NOT WORKING ON PARSE CLOUD
+// var user = new Parse.User();
+// user.set("username", uid);
+// user.set("password", "12345");
+// user.set("vkData", uid);
+// user.signUp(null, {
+// 	success: function(user) {
+// 		console.log("Registred");
+// 	},
+// 	error: function(user, error) {
+// 		console.error("Error: " + error.code + " " + error.message)
+// 	}
+// });
+
+//////////////
+//  HELPER  //
+//////////////
 
 function trim (str) {
 	str = str.replace(/^\s+/, '');
@@ -11,6 +28,15 @@ function trim (str) {
 		}
 	}
 	return str;
+}
+
+//////////////
+//    VK    //
+//////////////
+
+function vklogin (uid, access_token) {
+	console.log("uid= "+ uid + " token = " + access_token);
+
 }
 
 Parse.Cloud.define("ratingChange", function(request, response) {
@@ -64,25 +90,28 @@ Parse.Cloud.define("addRule", function(request, response) {
 		rating: 0
 	});
 	ruleObjectToPublish.save({
-			success: function(obj) {
-				response.success(obj); 
-			},
-			error: function(error, obj) {
-				response.error(error, obj);
-				// throw new Error(error);
-			}
+		success: function(obj) {
+			response.success(obj); 
+		},
+		error: function(error, obj) {
+			response.error(error, obj);
+			// throw new Error(error);
+		}
 	});
 });
 
-Parse.Cloud.define("regFB", function () {
-    // FB.login(function(response) {
-    //     if (response.authResponse) {
-    //         // connected
-    //     } else {
-    //         // cancelled
-    //     }
-    // });
-    FB.api('/me', function(response) {
-        console.log('Добро пожаловать на тёплую сторону мыла, ' + response.name + '.');
+Parse.Cloud.define('loginFB', function(request, response) {
+    var newUserToRegister = new Parse.User({
+    	url:		request.params.url,
+    	username:	request.params.username
     });
+    newUserToRegister.save({
+		success: function(obj) {
+			response.success(obj); 
+		},
+		error: function(error, obj) {
+			response.error(error, obj);
+			// throw new Error(error);
+		}
+	});
 });

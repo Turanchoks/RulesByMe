@@ -154,7 +154,7 @@
                     Войти с помощью
                     <a href="#" class="nounderline"><i class="icon-facebook"></i></a>
                     <a href="#" class="nounderline"><i class="icon-twitter"></i><a>
-                    <a href="https://oauth.vk.com/authorize?client_id=3313840&redirect_uri=http://rulesby.me/RulesByMe/close.html&response_type=token&scope=12&display=page" class="nounderline"><i class="icon-vk"></i></a>
+                    <a href="#" class="nounderline"><i class="icon-vk"></i></a>
                     <a href="#" class="nounderline"><i class="icon-gplus"></i><a>
                 </p>
             </div>
@@ -164,5 +164,12 @@
         <script type="text/javascript" src="js/handlebars.js"></script>
         <!-- Parse init -->
         <script type="text/javascript" src="js/main.js"></script>
+        <!-- VK Init -->
+        <script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript"></script>
+        <script type="text/javascript">
+          VK.init({
+            apiId: 3313840
+          });
+        </script>
     </body>
 </html>

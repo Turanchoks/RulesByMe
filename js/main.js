@@ -1,7 +1,12 @@
 ////////////
 // CONFIG //
 ////////////
-
+Parse.View = Parse.View.extend({ // change standart behavior of View.remove() to make it detach events
+	remove: function() {
+		this.$el.empty().detach();
+		return this;
+	}
+});
 Parse.initialize("7NWULxIRFzuMWrQ6bX1O8mm357Nz7jfHEWXhPevn", "yQmxvt5eKgJfbSCePpBM040ZUMj3iNHiucWBlpas");
 function dateToString(date) {
 	var trimmedDate = date.getFullYear().toString();
@@ -77,11 +82,12 @@ var SubmitRuleView = Parse.View.extend({
 	},
 	render: function() {
         var template = Handlebars.compile(this.source);
-        $('.firstLeft').html(template());
+        $('.firstLeft').html(template({user: "123"}));
 	},
 	initialize: function() {
 		this.render();
 	},
+	// Can't undestand, why it's here.
 	submitRule : function() {
 		var now = new Date();
 		var objectToPublish = {
@@ -193,7 +199,7 @@ Handlebars.registerHelper('get_username', function() {
         return new Handlebars.SafeString(Parse.User.current().get('username'));	
     }
     else {
-        return new Handlebars.SafeString("");
+        return "";
     }
 });
 
@@ -249,29 +255,111 @@ function login (event) {
 	$('#login-modal').modal('hide');
 	switch(event.data.type) {
 		case "facebook":
-			console.log('Hello, FB');
-			// Parse.FacebookUtils.logIn("user_likes,email", {
-			//   success: function(user) {
-			//     if (!user.existed()) {
-			//       alert("Пользователь подписался и вошёл с помощью Facebook!");
-			//     } else {
-			//       alert("Пользователь вошёл с помощью Facebook!")
-			//      }
-			//         app.submitRule.render();
-		 //    		app.navBar.render();
-		 //    		app.rulesNav.render();
-			//   },
-			//   error: function(user, error) {
-			//   	$('#login-modal').modal('hide');	
-			//     alert("Пользователь отменил вход при помощи Facebook или не полностью авторизовался.");
-			//   }
-			// });
+			// Checking is the guy is logged or not.
+			// Login function
+			var loginFB = function() {
+				FB.login(function(response) {
+					var userToRegister = {};
+			        if (response.authResponse) {
+			            // connected
+			            // Here I have to add my saving to server method.
+					    FB.api('/me', function(response) {
+					        userToRegister = {
+								url:		response.link,
+								username: 	response.name
+							};
+					    });
+					    Parse.Cloud.run('loginFB', userToRegister, {
+						  		success: function(obj) {
+									console.log('Вот это успех!');
+								},
+								error: function(error, obj) {
+									console.error('Нас постигла неудача.')
+								}
+						});
+			        }
+			        else {
+			            // cancelled
+			        }
+			    });
+
+			};
+		    // Checking function.
+			FB.getLoginStatus(function(response) {
+				if (response.status === 'connected') {
+					// connected
+					console.log('This guy is connected');
+					alert('Да вы уже зашли, сударь!');
+				} else if (response.status === 'not_authorized') {
+					// not_authorized
+					console.log('Да вы хер с горы, сударь!');
+				} else {
+				// not_logged_in
+				console.log('Вам необходимо зарегистрироваться!');
+				loginFB();
+					// I've got here to work with login() function. I guess
+					// that the FB.getLoginStatus is going to transfer to the
+					// login() methof in the EVENTS. This is going to be the
+					// checkup if the user is already registered.
+				}
+			});
 			break;
 		case "twitter":
 			
 			
 			break;
-			// 
+		case "vk":
+			VK.Auth.login(function(response) {
+			  if (response.session) {
+			    	var userid = response.session.mid;
+			    	console.log(response.session);
+
+					var qSearchVK = new Parse.Query('User');
+					qSearchVK.equalTo("username", userid);
+					qSearchVK.find({
+						success: function(User) {
+							// console.log(User.length);
+							if(!User.length) {
+								var newUser = new Parse.User();
+								newUser.set("username", userid);
+								newUser.set("password", "test");
+								newUser.set("vkAuth", {
+									userid: userid,
+									name: response.session.user.first_name + " " + response.session.user.last_name
+								});
+
+								newUser.signUp(null,
+								{
+								success: function(user)	{
+								    app.submitRule.render();
+								    app.navBar.render();
+								    app.rulesNav.render();
+								},
+								error: function(user, error) {
+									// Show the error message somewhere and let the user try again.
+									alert("Error: " + error.code + " " + error.message);
+								}
+								});
+							}
+							else {
+								Parse.User._saveCurrentUser(User[0]);
+								app.submitRule.render();
+								app.navBar.render();
+								app.rulesNav.render();
+							}
+						},
+						error: function() {
+
+					  	}
+						});						
+						}
+					// });
+			  // });
+			  //  else {
+			  // 	}
+			// }
+		});
+		break;
 	}
 }
 
