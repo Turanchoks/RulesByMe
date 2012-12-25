@@ -211,21 +211,6 @@ Handlebars.registerHelper('navbar_login', function() {
         return new Handlebars.SafeString("<li><a href=\"#\" id=\"modal-login\">Login</a></li>");
     }
 });
-
-Handlebars.registerHelper('if', function(conditional, options) {
-	console.log(conditional);
-  if(conditional) {
-    return options.fn(this);
-  } else {
-    return options.inverse(this);
-  }
-});
-
-Handlebars.registerHelper('is_auth', function(conditional, options) {
-	console.log("yap");
-	console.log(options);
-	return true;
-});
 ////////////
 // ROUTER //
 ////////////
