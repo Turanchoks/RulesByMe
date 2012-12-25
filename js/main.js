@@ -310,8 +310,53 @@ function login (event) {
 			});
 			break;
 		case "twitter":
-			
-			
+			twttr.anywhere(function (T) {
+				T.signIn();
+				T.bind("authComplete", function (e, user) {
+      				// triggered when auth completed successfully
+      				console.log(user);
+      				var userid = user.idStr;
+      				var name = user.name;
+      				var userPic = user.profileImageUrl;
+
+      				var qSearchTW = new Parse.Query('User');
+      				qSearchTW.equalTo("username", userid);
+      				qSearchTW.find({
+						success: function(User) {
+							// console.log(User.length);
+							if(!User.length) {
+								var newUser = new Parse.User();
+								newUser.set("username", userid);
+								newUser.set("password", "test");
+								newUser.set("twAuth", {
+									userid: userid,
+									name: name,
+								});
+								newUser.set("userPic", userPic);
+
+								newUser.signUp(null,
+								{
+								success: function(user)	{
+								    app.submitRule.render();
+								    re_render();
+								},
+								error: function(user, error) {
+									// Show the error message somewhere and let the user try again.
+									alert("Error: " + error.code + " " + error.message);
+								}
+								});
+							}
+							else {
+								Parse.User._saveCurrentUser(User[0]);
+								re_render();
+							}
+						},
+						error: function() {
+
+					  	}
+					});	
+    			});
+			});
 			break;
 		case "vk":
 			VK.Auth.login(function(response) {
@@ -337,8 +382,7 @@ function login (event) {
 								{
 								success: function(user)	{
 								    app.submitRule.render();
-								    app.navBar.render();
-								    app.rulesNav.render();
+								    re_render();
 								},
 								error: function(user, error) {
 									// Show the error message somewhere and let the user try again.
@@ -348,9 +392,7 @@ function login (event) {
 							}
 							else {
 								Parse.User._saveCurrentUser(User[0]);
-								app.submitRule.render();
-								app.navBar.render();
-								app.rulesNav.render();
+								re_render();
 							}
 						},
 						error: function() {
@@ -398,9 +440,7 @@ function login (event) {
 									newUser.signUp(null,
 									{
 									success: function(user)	{
-									    app.submitRule.render();
-									    app.navBar.render();
-									    app.rulesNav.render();
+										re_render();
 									},
 									error: function(user, error) {
 										// Show the error message somewhere and let the user try again.
@@ -410,9 +450,7 @@ function login (event) {
 								}
 								else {
 									Parse.User._saveCurrentUser(User[0]);
-									app.submitRule.render();
-									app.navBar.render();
-									app.rulesNav.render();
+									re_render();
 								}
 							},
 							error: function() {
@@ -426,15 +464,19 @@ function login (event) {
 	}
 }
 
-function logout () {
-	Parse.User.logOut();
-    app.submitRule.render();
+function re_render() {
+	app.submitRule.render();
     app.navBar.render();
     app.rulesNav.render();
 }
 
+function logout () {
+	Parse.User.logOut();
+	re_render();
+}
+
 function notify() {
-	alert("clicked");
+	alert("change auth");
 }
 
 $("body").on("click", "a#modal-login", function() {
