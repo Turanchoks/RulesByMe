@@ -259,27 +259,29 @@ function login (event) {
 			// Login function
 			var loginFB = function() {
 				FB.login(function(response) {
-					var userToRegister = {};
 			        if (response.authResponse) {
 			            // connected
-			            // Here I have to add my saving to server method.
+			            // Creating new user on the server.
 					    FB.api('/me', function(response) {
-					  		//	userToRegister = {
-							// 	url:		response.link,
-							// 	username: 	response.name
-							// };
-							userToRegister.url = response.link;
-							userToRegister.username = response.name;
-
-					    });
-					    Parse.Cloud.run('registrationFB', userToRegister, {
-						  		success: function(obj) {
-									console.log('Вот это успех!');
+						    var newUser = new Parse.User({
+						    	url:		response.link,
+						    	username:	response.name,
+						    	email:  	'gaga@gaga.com',
+						    	password: 	'12345'
+						    });
+						    newUser.signUp(null,
+								{
+								success: function(user)	{
+								    app.submitRule.render();
+								    app.navBar.render();
+								    app.rulesNav.render();
 								},
-								error: function(error, obj) {
-									console.error(error, obj)
+								error: function(user, error) {
+									// Show the error message somewhere and let the user try again.
+									alert("Error: " + error.code + " " + error.message);
 								}
-						});
+							});
+					    });
 			        }
 			        else {
 			            // cancelled
