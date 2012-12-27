@@ -22,6 +22,7 @@ function dateToString(date) {
 // STRUCTURE  //
 ////////////////
 var RuleObject = Parse.Object.extend('Rule',{});
+
 var RuleCollection = Parse.Collection.extend({
  	model: RuleObject,
 });
@@ -196,7 +197,7 @@ Handlebars.registerHelper('submit_button', function() {
 
 Handlebars.registerHelper('get_username', function() {
     if (Parse.User.current()) {
-        return new Handlebars.SafeString(Parse.User.current().get('username'));	
+        return new Handlebars.SafeString(Parse.User.current().get('author_name'));	
     }
     else {
         return "";
@@ -251,6 +252,45 @@ var Router = Parse.Router.extend({
 //////////////
 //  EVENTS  //
 //////////////
+function loginWith(provider, user)
+{
+	var query = new Parse.Query('User');
+	query.equalTo(provider + "_id", user[provider + "_id"]);
+	query.find({
+		success: function(Users) {
+			console.log(Users);
+			if (!Users.length) {
+				var newUser = new Parse.User(user);
+				newUser.signUp(null,
+				{
+					success: function(user) {
+						re_render();
+					},
+					error: function(user, error) {
+
+					}
+				})
+			}
+			else {
+				Parse.User._saveCurrentUser(Users[0]);
+				re_render();
+			}
+		},
+		error: function(Users, errror) {
+			alert("Error: " + error.code + " " + error.message);
+		}
+	})
+}
+
+function linkWith(provider, id) {
+	if (Parse.User.current()) {
+		Parse.User.current.set(provider + "_id", id);
+	}
+	else {
+		alert("please login first");
+	}
+}
+
 function login (event) {
 	$('#login-modal').modal('hide');
 	switch(event.data.type) {
@@ -315,148 +355,56 @@ function login (event) {
 				T.bind("authComplete", function (e, user) {
       				// triggered when auth completed successfully
       				console.log(user);
-      				var userid = user.idStr;
-      				var name = user.name;
-      				var userPic = user.profileImageUrl;
-
-      				var qSearchTW = new Parse.Query('User');
-      				qSearchTW.equalTo("username", userid);
-      				qSearchTW.find({
-						success: function(User) {
-							// console.log(User.length);
-							if(!User.length) {
-								var newUser = new Parse.User();
-								newUser.set("username", userid);
-								newUser.set("password", "test");
-								newUser.set("twAuth", {
-									userid: userid,
-									name: name,
-								});
-								newUser.set("userPic", userPic);
-
-								newUser.signUp(null,
-								{
-								success: function(user)	{
-								    app.submitRule.render();
-								    re_render();
-								},
-								error: function(user, error) {
-									// Show the error message somewhere and let the user try again.
-									alert("Error: " + error.code + " " + error.message);
-								}
-								});
-							}
-							else {
-								Parse.User._saveCurrentUser(User[0]);
-								re_render();
-							}
-						},
-						error: function() {
-
-					  	}
-					});	
-    			});
+      				var newUser = {
+      					username: user.idStr,
+      					password: user.profileBackgroundColor,
+      					twitter_id: user.id,
+      					author_name: user.name,
+      					userpic: user.profileImageUrl
+      				};
+					loginWith("twitter", newUser);     				
+      			});
 			});
-			break;
+		break;
 		case "vk":
 			VK.Auth.login(function(response) {
-			  if (response.session) {
+			  	if (response.session) {
 			    	var userid = response.session.mid;
 			    	console.log(response.session);
 
-					var qSearchVK = new Parse.Query('User');
-					qSearchVK.equalTo("username", userid);
-					qSearchVK.find({
-						success: function(User) {
-							// console.log(User.length);
-							if(!User.length) {
-								var newUser = new Parse.User();
-								newUser.set("username", userid);
-								newUser.set("password", "test");
-								newUser.set("vkAuth", {
-									userid: userid,
-									name: response.session.user.first_name + " " + response.session.user.last_name
-								});
-
-								newUser.signUp(null,
-								{
-								success: function(user)	{
-								    app.submitRule.render();
-								    re_render();
-								},
-								error: function(user, error) {
-									// Show the error message somewhere and let the user try again.
-									alert("Error: " + error.code + " " + error.message);
-								}
-								});
-							}
-							else {
-								Parse.User._saveCurrentUser(User[0]);
-								re_render();
-							}
-						},
-						error: function() {
-
-					  	}
-						});						
-						}
-					// });
-			  // });
-			  //  else {
-			  // 	}
-			// }
+      				var newUser = {
+      					username: response.session.mid,
+      					password: response.session.sig,
+      					vk_id: response.session.mid,
+      					author_name: response.session.user.first_name + " " + response.session.user.last_name,
+      					// userpic: user.profileImageUrl
+      				};
+      				loginWith("vk", newUser);
+				}
 		});
 		break;
 		case "gplus": 
 			gapi.client.load('plus', 'v1', function() { 
-				// alert("gplus sdk loaded");
 				var clientId = '923974640051-ht5uitgkdjvl4pmhf4qlm5o22qaad211.apps.googleusercontent.com';
 				var apiKey = 'AIzaSyAM24v0bbMXxesyKUTwoWDpkwfVUv-fcXo';
 				var scopes = 'https://www.googleapis.com/auth/plus.me';
 				gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, function(authResult){
-					// console.log(authResult);
 					var request = gapi.client.plus.people.get({
           				'userId': 'me'
             		});
       				request.execute(function(resp) {
-						// console.log(resp);
+						console.log(resp);
 						var userid = resp.id;
 						var name = resp.displayName;
 
-						var qSearchGplus = new Parse.Query('User');
-						qSearchGplus.equalTo("gplusID", userid);
-						qSearchGplus.find({
-							success: function(User) {
-								if(!User.length) {
-									var newUser = new Parse.User();
-									newUser.set("username", userid);
-									newUser.set("password", "test");
-									newUser.set("gplusAuth", {
-										userid: userid,
-										name: name
-									});
-									newUser.set("gplusID", userid);
-
-									newUser.signUp(null,
-									{
-									success: function(user)	{
-										re_render();
-									},
-									error: function(user, error) {
-										// Show the error message somewhere and let the user try again.
-										alert("Error: " + error.code + " " + error.message);
-									}
-									});
-								}
-								else {
-									Parse.User._saveCurrentUser(User[0]);
-									re_render();
-								}
-							},
-							error: function() {
-
-							}
-						})
+	      				var newUser = {
+	      					username: resp.id,
+	      					password: resp.etag,
+	      					gplus_id: resp.id,
+	      					author_name: resp.displayName,
+	      					userpic: resp.image.url
+	      				};
+	      				loginWith("gplus", newUser);
         			});
 				}); 
 			});
