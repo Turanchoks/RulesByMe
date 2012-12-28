@@ -254,6 +254,7 @@ var Router = Parse.Router.extend({
 //////////////
 function loginWith(provider, user)
 {
+	console.log(user);
 	var query = new Parse.Query('User');
 	query.equalTo(provider + "_id", user[provider + "_id"]);
 	query.find({
@@ -261,13 +262,14 @@ function loginWith(provider, user)
 			console.log(Users);
 			if (!Users.length) {
 				var newUser = new Parse.User(user);
+				console.log(newUser);
 				newUser.signUp(null,
 				{
 					success: function(user) {
 						re_render();
 					},
 					error: function(user, error) {
-
+						console.log('Днище ' + error.message);
 					}
 				})
 			}
@@ -295,59 +297,47 @@ function login (event) {
 	$('#login-modal').modal('hide');
 	switch(event.data.type) {
 		case "facebook":
-			// Checking is the guy is logged or not.
 			// Login function
-			var loginFB = function() {
-				FB.login(function(response) {
-			        if (response.authResponse) {
-			            // connected
-			            // Creating new user on the server.
-					    FB.api('/me', function(response) {
-						    var newUser = new Parse.User({
-						    	url:		response.link,
-						    	username:	response.name,
-						    	email:  	'gaga@gaga.com',
-						    	password: 	'12345'
-						    });
-						    newUser.signUp(null,
-								{
-								success: function(user)	{
-								    app.submitRule.render();
-								    app.navBar.render();
-								    app.rulesNav.render();
-								},
-								error: function(user, error) {
-									// Show the error message somewhere and let the user try again.
-									alert("Error: " + error.code + " " + error.message);
-								}
-							});
-					    });
-			        }
-			        else {
-			            // cancelled
-			        }
-			    });
-
-			};
+			FB.login(function(response) {
+		        if (response.authResponse) {
+		            // connected
+		            // Creating new user on the server.
+				    FB.api('/me', function(response) {
+					    var newUser = {
+					    	username:		response.id,
+					    	password: 	'12345',
+					    	facebook_id: 	response.id,
+					    	author_name:	response.name,
+					    	// userpic: 		response.picture,
+					    	// email:  	'gaga@gaga.com',
+					    };
+					    loginWith("facebook", newUser);
+				    });
+		        }
+		        else {
+		            // cancelled
+		        }
+		    });
 		    // Checking function.
-			FB.getLoginStatus(function(response) {
-				if (response.status === 'connected') {
-					// connected
-					console.log('This guy is connected');
-					alert('Да вы уже зашли, сударь!');
-				} else if (response.status === 'not_authorized') {
-					// not_authorized
-					console.log('Да вы хер с горы, сударь!');
-				} else {
-				// not_logged_in
-				console.log('Вам необходимо зарегистрироваться!');
-				loginFB();
-					// I've got here to work with login() function. I guess
-					// that the FB.getLoginStatus is going to transfer to the
-					// login() methof in the EVENTS. This is going to be the
-					// checkup if the user is already registered.
-				}
-			});
+			// FB.getLoginStatus(function(response) {
+			// 	if (response.status === 'connected') {
+			// 		// connected
+			// 		FB.logout(function(response) {
+			// 			console.log('Пользователь вышел как с сайта, так и с Facebook.')
+			// 		});
+			// 	} else if (response.status === 'not_authorized') {
+			// 		// not_authorized
+			// 		console.log('Вы не авторизированы!');
+			// 	} else {
+			// 	// not_logged_in
+			// 	console.log('Вам необходимо зарегистрироваться!');
+			// 	loginFB();
+			// 		// I've got here to work with login() function. I guess
+			// 		// that the FB.getLoginStatus is going to transfer to the
+			// 		// login() methof in the EVENTS. This is going to be the
+			// 		// checkup if the user is already registered.
+			// 	}
+			// });
 			break;
 		case "twitter":
 			twttr.anywhere(function (T) {
@@ -402,7 +392,6 @@ function login (event) {
 	      					password: resp.etag,
 	      					gplus_id: resp.id,
 	      					author_name: resp.displayName,
-	      					userpic: resp.image.url
 	      				};
 	      				loginWith("gplus", newUser);
         			});

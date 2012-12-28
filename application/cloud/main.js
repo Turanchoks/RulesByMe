@@ -99,21 +99,3 @@ Parse.Cloud.define("addRule", function(request, response) {
 		}
 	});
 });
-
-Parse.Cloud.define('registrationFB', function(request, response) {
-    var newUserToRegister = new Parse.User({
-    	url:		request.params.url,
-    	username:	request.params.username,
-    	email:  	'gaga@gaga.com',
-    	password: 	'12345'
-    });
-    newUserToRegister.save({
-		success: function(obj) {
-			response.success(obj); 
-		},
-		error: function(error, obj) {
-			response.error(error, obj);
-			// throw new Error(error);
-		}
-	});
-});
