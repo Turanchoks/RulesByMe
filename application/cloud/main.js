@@ -89,6 +89,7 @@ Parse.Cloud.define("addRule", function(request, response) {
 		},
 		rating: 0
 	});
+
 	ruleObjectToPublish.save({
 		success: function(obj) {
 			response.success(obj); 

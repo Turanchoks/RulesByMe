@@ -49,8 +49,18 @@ var RuleView = Parse.View.extend({
         this.model.increment('rating', increment);
         this.undelegateEvents('click .ratingChange');
         Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
-  			success: function(obj) {
-  				console.log(obj);
+  			success: function(rule) {
+				var user = Parse.User.current();
+				var relation = user.relation("voted");
+				relation.add(rule);
+				user.save(null, {
+					success: function(s) {
+						console.log(s);
+					},
+					error: function(e) {
+						console.log(e);
+					}
+				});
   			},
   			error: function(error) {
   				console.error(error);
@@ -83,7 +93,7 @@ var SubmitRuleView = Parse.View.extend({
 	},
 	render: function() {
         var template = Handlebars.compile(this.source);
-        $('.firstLeft').html(template({user: "123"}));
+        $('.firstLeft').html(template());
 	},
 	initialize: function() {
 		this.render();
@@ -102,7 +112,8 @@ var SubmitRuleView = Parse.View.extend({
 		{
 			success: function(obj) {
 				$('.submission').find('input').val(''); // Clear inputs
-				console.log(obj);
+				obj.set("user", Parse.User.current());
+				obj.save();
 			},
 			error: function(error, obj) {
 				console.error(JSON.parse(error.message).message);
@@ -138,13 +149,19 @@ var RulesNav = Parse.View.extend({
 // Here I compile the way the welcoming page is shown.
 var LogInView = Parse.View.extend({
     template: $('#template-logInView').html(),
+    events: {
+		'click #login': 'tstlogin'
+	},
     initialize: function(){
         this.render();
     },
     render: function() {
         var source = Handlebars.compile(this.template);
         $('#login-modal').html(source);
-    }
+    },
+   	tstlogin: function(e) {
+		console.log(e);
+	}
 });
 
 var AppView = Parse.View.extend({
@@ -272,7 +289,7 @@ function loginWith(provider, user)
 				})
 			}
 			else {
-				Parse.User._saveCurrentUser(Users[0]);
+				Users[0]._handleSaveResult(true);
 				re_render();
 			}
 		},
@@ -291,7 +308,7 @@ function linkWith(provider, id) {
 	}
 }
 
-function login (event) {
+function socialAuth(event) {
 	$('#login-modal').modal('hide');
 	switch(event.data.type) {
 		case "facebook":
@@ -423,21 +440,6 @@ function logout () {
 	re_render();
 }
 
-function notify() {
-	alert("change auth");
-}
-
-$("body").on("click", "a#modal-login", function() {
-		$('#login-modal').modal('toggle');
-	});
-
-$("body").on("click", "i.icon-facebook", {type: "facebook"}, login);
-$("body").on("click", "i.icon-twitter", {type: "twitter"}, login);
-$("body").on("click", "i.icon-vk", {type: "vk"}, login);
-$("body").on("click", "i.icon-gplus", {type: "gplus"}, login);
-
-$("body").on("click", "a#logout", logout);
-
 //////////////
 // ON START //
 //////////////
@@ -446,26 +448,3 @@ var router = new Router();
 $(function() {
    Parse.history.start(); 
 });
-
-// NEW
-// var positions = document.getElementsByClassName('position');
-// var Views = {}; // Object with id's of elements for Views
-// for (var i = 0; i < positions.length; i++) {
-// 	Views[positions[i].getAttribute('id')] = null;
-// }
-// Parse.View = Parse.View.extend({
-// 	render: function() {
-// 		this.$el.html(this.template(this.model.toJSON()));
-// 	},
-// 	initialize: function() {
-// 		this.render();
-// 		Views[this.el.getAttribute('id')] = this;
-// 		// this.model.on('change', this.render, this);
-// 		// this.collection.on('change', this.render, this);
-// 		// this.collection.on('add', this.render, this);
-// 	},
-// 	remove: function() { // change standart behavior of View.remove() to make it detach events
-// 		this.$el.empty().detach();
-// 		return this;
-// 	}
-// });
