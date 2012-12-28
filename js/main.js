@@ -76,9 +76,22 @@ var RuleView = Parse.View.extend({
 	template: Handlebars.compile($('#template-rule').html()),
 	events: {
 		'click .ratingChange' : 'ratingChange',
+		'click .shareFB' : 'shareFB'
 	},
 	init: function() {
 		this.model.set('datetime', dateToString(this.model.createdAt));
+		this.model.set('author_url', 'http://rulesby.me/author/'+ this.model.get('user').id);
+		this.model.set('vkShare', VK.Share.button({
+		  url: 'http://rulesby.me/rule/' + this.model.id,
+		  title: 'Rules by ' + this.model.get('author_name'),
+		  description : '1. ' + this.model.get('rule1') + '\n' + ' 2. ' + this.model.get('rule2') + '\n' + ' 3. ' + this.model.get('rule3'),
+		  image: 'http://rulesby.me/img/logo_rbm.png',
+		  noparse: true
+		},
+		{
+			type : 'custom',
+			text : '<img src="http://rulesby.me/img/vkontakte.png" class="share_img vk"/>'
+		}));
 	},
 	ratingChange: function(e) {
         var increment = parseInt($(e.target).data('add-rating'));
@@ -102,6 +115,18 @@ var RuleView = Parse.View.extend({
   				console.error(error);
   			}
 		});
+	},
+	shareFB: function() {
+		FB.ui({
+	      method: 'feed',
+	      link: 'http://rulesby.me/rule/' + this.model.id,
+	      picture: 'http://rulesby.me/img/logo_rbm.png',
+	      name: 'Rules by ' + this.model.get('author_name'),
+	      caption: 'RulesBy.Me',
+	      properties : { 1 : this.model.get('rule1'), 2 : this.model.get('rule1'), 3 : this.model.get('rule1')}
+	    }, function() {
+
+	    })
 	}
 });
 var RuleCollectionView = Parse.View.extend({

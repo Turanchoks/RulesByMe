@@ -70,7 +70,7 @@
         <script type="text/template" id='template-rule'>
             <div id="rule-id-{{objectId}}">
                 <div class='author'>
-                    Rule By <a href="{{author.url}}" class="authorUrl">{{author.username}}</a>
+                    Rule By <a href="{{author_url}}" class="authorUrl">{{author_name}}</a>
                     <div class="rating">
                         <a class="ratingChange" data-add-rating="1">+</a>
                         <span class="ratingValue">{{rating}}</span>
@@ -83,6 +83,7 @@
                     <li>{{rule3}}</li>
                 </ol>
                 <div class="ruleDatetime">{{datetime}}</div>
+                <div class="share">{{{vkShare}}} <img src='http://rulesby.me/img/facebook.png' class='shareFB'/></div>
             </div>
         </script>
 
@@ -91,7 +92,7 @@
                 {{#each ruleCollection}}
                 <div id="rule-id-{{objectId}}">
                     <div class='author'>
-                        Rule By <a href="{{author.url}}" class="authorUrl">{{author.username}}</a>
+                        Rule By <a href="{{author.url}}" class="authorUrl">{{author_name}}</a>
                         <div class="rating">
                             <a class="ratingChange" data-add-rating="1">+</a>
                             <span class="ratingValue">{{rating}}</span>
@@ -195,6 +196,7 @@
         <script type="text/javascript" src="js/main.js"></script>
         <!-- VK Init -->
         <script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript"></script>
+        <script type="text/javascript" src="http://vkontakte.ru/js/api/share.js?9" charset="windows-1251"></script>
         <script type="text/javascript">
           VK.init({
             apiId: 3313840
