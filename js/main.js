@@ -53,8 +53,7 @@ function submitRule() {
 	Parse.Cloud.run('addRule', objectToPublish, {
 		success: function(obj) {
 			$('.submission').find('input').val(''); // Clear inputs
-			obj.set("user", Parse.User.current());
-			obj.save();
+			console.log(obj);
 		},
 		error: function(error, obj) {
 			console.error(JSON.parse(error.message).message);
@@ -95,13 +94,17 @@ var RuleView = Parse.View.extend({
 		}));
 	},
 	ratingChange: function(e) {
+		if(!Parse.User.current()) 	{
+			$('#login-modal').modal('toggle');
+			return
+		}
         var increment = parseInt($(e.target).data('add-rating'));
         this.model.increment('rating', increment);
         this.undelegateEvents('click .ratingChange');
-        Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment, "userID": Parse.User.current().id }, {
+        Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
   			success: function(rule) {
-  				var user = Parse.User.current();
-  				var relation = user.relation("voted");
+				var user = Parse.User.current();
+				var relation = user.relation("voted");
 				relation.add(rule);
 				user.save(null, {
 					success: function(s) {
@@ -126,7 +129,7 @@ var RuleView = Parse.View.extend({
 	      caption: 'RulesBy.Me',
 	      properties : { 1 : this.model.get('rule1'), 2 : this.model.get('rule1'), 3 : this.model.get('rule1')}
 	    }, function() {
-
+	    	console.log('succes FB')
 	    })
 	}
 });
@@ -153,19 +156,13 @@ var SubmitRuleView = Parse.View.extend({
 	events: {
 		'click .publish' : 'submitRule'
 	},
-	render: function() {
+	init: function() {
 		this.toRender = {
         	isAuthorised: !!Parse.User.current(), 
         	username: Parse.User.current() ?  Parse.User.current().get('author_name') : ""		
-		};
-		this.$el.html(this.template(this.toRender));
-	},
-	init: function() {
-
+		}
 	},	
-	submitRule : function() {
-		submitRule();
-	}
+	submitRule : submitRule
 });
 
 
@@ -180,13 +177,6 @@ var NavBarView = Parse.View.extend({
 		this.toRender = { isAuthorised: !!Parse.User.current() };
 		if(Parse.User.current())
 			this.toRender.name = Parse.User.current().get('author_name')
-	},
-	render: function() {
-		this.toRender = {
-        	isAuthorised: !!Parse.User.current(), 
-        	username: Parse.User.current() ?  Parse.User.current().get('author_name') : ""		
-		};
-		this.$el.html(this.template(this.toRender));
 	},
 	modalLogin: function() {
 		$('#login-modal').modal('toggle');
@@ -236,7 +226,7 @@ var AppView = Parse.View.extend({
 //////////////////////
 // HELPER FUNCTIONS //
 //////////////////////
-function queryRules(condition, userID) {
+function queryRules(condition, userId) {
 	var now   = new Date(); // today
 	var query = new Parse.Query(RuleObject);
 	query.ascending('rating');
@@ -251,10 +241,8 @@ function queryRules(condition, userID) {
             query.greaterThanOrEqualTo('createdAt', date);
             break;
         case 'myRules':
-        	query.equalTo("user", Parse.User.current());
             break;
         case 'userRules':
-        	query.equalTo("user", userID);
             break;
 	}
 	return query.collection();
@@ -287,12 +275,7 @@ var Router = Parse.Router.extend({
         });
 	},
     myRules: function() {
-        queryRules('myRules').fetch({
-            success: function(collection) {
-                app.rulesView.collection = collection;
-                app.rulesView.render();
-            }
-        });    	
+        console.log(Parse.User.current());  
     },
 	oneRule: function(id) {},
 	about: function() {},
@@ -300,12 +283,7 @@ var Router = Parse.Router.extend({
 
     },
     rulesByAuthor: function(id) {
-        queryRules('userRules', id).fetch({
-            success: function(collection) {
-                app.rulesView.collection = collection;
-                app.rulesView.render();
-            }
-        });
+
     }
 });
 //////////////
@@ -313,18 +291,22 @@ var Router = Parse.Router.extend({
 //////////////
 function loginWith(provider, user)
 {
+	console.log(user);
 	var query = new Parse.Query('User');
 	query.equalTo(provider + "_id", user[provider + "_id"]);
 	query.find({
 		success: function(Users) {
+			console.log(Users);
 			if (!Users.length) {
 				var newUser = new Parse.User(user);
+				console.log(newUser);
 				newUser.signUp(null,
 				{
 					success: function(user) {
 						re_render();
 					},
 					error: function(user, error) {
+						console.log('Днище ' + error.message);
 					}
 				})
 			}
@@ -361,10 +343,11 @@ function socialAuth(provider) {
 				    FB.api('/me', function(response) {
 					    var newUser = {
 					    	username:		response.id,
-					    	password: 	'12345',
+					    	password: 		'12345',
 					    	facebook_id: 	response.id,
 					    	author_name:	response.name,
 					    	// userpic: 		response.picture,
+					    	// email:  	'gaga@gaga.com',
 					    };
 					    loginWith("facebook", newUser);
 				    });
@@ -423,7 +406,7 @@ function socialAuth(provider) {
 						};
 					loginWith("gplus", newUser);
 					}); 
-			});
+				});
 			});
 		break;
 	}
@@ -433,6 +416,7 @@ function re_render() {
 	app.submitRule.render();
     app.navBar.render();
     app.rulesNav.render();
+    app.rulesView.render();
 }
 
 function logout () {
