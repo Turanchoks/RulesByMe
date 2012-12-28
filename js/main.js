@@ -53,7 +53,6 @@ function submitRule() {
 	Parse.Cloud.run('addRule', objectToPublish, {
 		success: function(obj) {
 			$('.submission').find('input').val(''); // Clear inputs
-			// console.log(obj);
 			obj.set("user", Parse.User.current());
 			obj.save();
 		},
@@ -140,7 +139,6 @@ var SubmitRuleView = Parse.View.extend({
 
 	},	
 	submitRule : function() {
-		console.log('clicked');
 		submitRule();
 	}
 });
@@ -213,7 +211,7 @@ var AppView = Parse.View.extend({
 //////////////////////
 // HELPER FUNCTIONS //
 //////////////////////
-function queryRules(condition, userId) {
+function queryRules(condition, userID) {
 	var now   = new Date(); // today
 	var query = new Parse.Query(RuleObject);
 	query.ascending('rating');
@@ -228,8 +226,10 @@ function queryRules(condition, userId) {
             query.greaterThanOrEqualTo('createdAt', date);
             break;
         case 'myRules':
+        	query.equalTo("user", Parse.User.current());
             break;
         case 'userRules':
+        	query.equalTo("user", userID);
             break;
 	}
 	return query.collection();
@@ -262,7 +262,12 @@ var Router = Parse.Router.extend({
         });
 	},
     myRules: function() {
-        console.log(Parse.User.current());  
+        queryRules('myRules').fetch({
+            success: function(collection) {
+                app.rulesView.collection = collection;
+                app.rulesView.render();
+            }
+        });    	
     },
 	oneRule: function(id) {},
 	about: function() {},
@@ -270,7 +275,12 @@ var Router = Parse.Router.extend({
 
     },
     rulesByAuthor: function(id) {
-
+        queryRules('userRules', id).fetch({
+            success: function(collection) {
+                app.rulesView.collection = collection;
+                app.rulesView.render();
+            }
+        });
     }
 });
 //////////////
@@ -290,7 +300,6 @@ function loginWith(provider, user)
 						re_render();
 					},
 					error: function(user, error) {
-						console.log('Днище ' + error.message);
 					}
 				})
 			}
