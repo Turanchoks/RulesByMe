@@ -30,43 +30,38 @@ function trim (str) {
 	return str;
 }
 
-//////////////
-//    VK    //
-//////////////
-
-function vklogin (uid, access_token) {
-	console.log("uid= "+ uid + " token = " + access_token);
-
-}
-
 Parse.Cloud.define("ratingChange", function(request, response) {
 	if (request.params.increment != 1 && request.params.increment != -1) {
 		response.success("cheat!");
 		return;
 	}
-	var query = new Parse.Query("Rule");
-	query.get(request.params.RuleID, {
-		success: function(Rule) {
-			/*if (request.user) {
-					if((Parse._.indexOf(request.user.get("voted"), Rule.id) == -1)) {*/
-						Rule.increment("rating", request.params.increment);
-						Rule.save();
-						response.success(Rule);
-					/*	currentUser.add("voted", Rule.id);
-						currentUser.save();
-					}
-					else {
-						//Придумать интерактив на тему "пошли нахрен"
-						response.success(">_<");
-					}
+
+	var query = new Parse.Query("User");
+	query.get(request.params.userID, {
+		success: function(User) {
+			User.relation("voted").query().get(request.params.RuleID, {
+				success: function(Rule) {
+					console.log("Rules was voted");
+				},
+				error: function(obj, error) {
+					console.log("Rules wasn't voted by user");
+					var ruleQuery = new Parse.Query("Rule");
+					ruleQuery.get(request.params.RuleID, {
+						success: function(Rule) {
+							Rule.increment("rating", request.params.increment);
+							console.log("increment");
+							Rule.save();	
+							response.success(Rule);			
+						},
+						error: function() {
+
+						}
+					});
 				}
-				else 
-				{
-					//new LogInView(); - показываем 
-				}*/
+			});
 		},
 		error: function() {
-			response.error("rule not found");
+			response.error("user not found");
 		}
 	});
 });
@@ -78,15 +73,14 @@ Parse.Cloud.define("addRule", function(request, response) {
 			return;
 		};
 	}
+
+	console.log(request);
+
 	var ruleObjectToPublish = new RuleObject({
 		rule1: request.params.rule1,
 		rule2: request.params.rule2,
 		rule3: request.params.rule3,
-		author: {
-			id: request.user.id,
-			url: request.user.get('url'),
-			username: request.user.get('username'),
-		},
+		author_name: request.params.author,
 		rating: 0
 	});
 
@@ -99,4 +93,9 @@ Parse.Cloud.define("addRule", function(request, response) {
 			// throw new Error(error);
 		}
 	});
+});
+
+Parse.Cloud.define("Logger", function(request, response) {
+  console.log(request);
+  response.success();
 });
