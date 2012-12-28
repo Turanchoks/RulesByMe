@@ -53,7 +53,9 @@ function submitRule() {
 	Parse.Cloud.run('addRule', objectToPublish, {
 		success: function(obj) {
 			$('.submission').find('input').val(''); // Clear inputs
-			console.log(obj);
+			// console.log(obj);
+			obj.set("user", Parse.User.current());
+			obj.save();
 		},
 		error: function(error, obj) {
 			console.error(JSON.parse(error.message).message);
@@ -84,10 +86,10 @@ var RuleView = Parse.View.extend({
         var increment = parseInt($(e.target).data('add-rating'));
         this.model.increment('rating', increment);
         this.undelegateEvents('click .ratingChange');
-        Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
+        Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment, "userID": Parse.User.current().id }, {
   			success: function(rule) {
-				var user = Parse.User.current();
-				var relation = user.relation("voted");
+  				var user = Parse.User.current();
+  				var relation = user.relation("voted");
 				relation.add(rule);
 				user.save(null, {
 					success: function(s) {
@@ -127,11 +129,15 @@ var SubmitRuleView = Parse.View.extend({
 	events: {
 		'click .publish' : 'submitRule'
 	},
-	init: function() {
+	render: function() {
 		this.toRender = {
         	isAuthorised: !!Parse.User.current(), 
         	username: Parse.User.current() ?  Parse.User.current().get('author_name') : ""		
-		}
+		};
+		this.$el.html(this.template(this.toRender));
+	},
+	init: function() {
+
 	},	
 	submitRule : function() {
 		console.log('clicked');
@@ -151,6 +157,13 @@ var NavBarView = Parse.View.extend({
 		this.toRender = { isAuthorised: !!Parse.User.current() };
 		if(Parse.User.current())
 			this.toRender.name = Parse.User.current().get('author_name')
+	},
+	render: function() {
+		this.toRender = {
+        	isAuthorised: !!Parse.User.current(), 
+        	username: Parse.User.current() ?  Parse.User.current().get('author_name') : ""		
+		};
+		this.$el.html(this.template(this.toRender));
 	},
 	modalLogin: function() {
 		$('#login-modal').modal('toggle');
@@ -265,15 +278,12 @@ var Router = Parse.Router.extend({
 //////////////
 function loginWith(provider, user)
 {
-	console.log(user);
 	var query = new Parse.Query('User');
 	query.equalTo(provider + "_id", user[provider + "_id"]);
 	query.find({
 		success: function(Users) {
-			console.log(Users);
 			if (!Users.length) {
 				var newUser = new Parse.User(user);
-				console.log(newUser);
 				newUser.signUp(null,
 				{
 					success: function(user) {
@@ -321,7 +331,6 @@ function socialAuth(provider) {
 					    	facebook_id: 	response.id,
 					    	author_name:	response.name,
 					    	// userpic: 		response.picture,
-					    	// email:  	'gaga@gaga.com',
 					    };
 					    loginWith("facebook", newUser);
 				    });
