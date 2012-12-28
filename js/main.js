@@ -135,6 +135,7 @@ var SubmitRuleView = Parse.View.extend({
 	},	
 	submitRule : function() {
 		console.log('clicked');
+		submitRule();
 	}
 });
 
@@ -174,7 +175,8 @@ var LogInView = Parse.View.extend({
     },
     login: function(e) {
     	var iconClass = e.srcElement.getAttribute('class');
-    	console.log(iconClass.slice(iconClass.search('-')+1))
+    	var provider = iconClass.slice(iconClass.search('-')+1);
+    	socialAuth(provider);
     }
 });
 
@@ -302,9 +304,9 @@ function linkWith(provider, id) {
 	}
 }
 
-function socialAuth(event) {
+function socialAuth(provider) {
 	$('#login-modal').modal('hide');
-	switch(event.data.type) {
+	switch(provider) {
 		case "facebook":
 			// Checking is the guy is logged or not.
 			// Login function
