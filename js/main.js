@@ -278,7 +278,7 @@ function loginWith(provider, user)
 				re_render();
 			}
 		},
-		error: function(Users, errror) {
+		error: function(Users, error) {
 			alert("Error: " + error.code + " " + error.message);
 		}
 	})
@@ -318,26 +318,6 @@ function login (event) {
 		            // cancelled
 		        }
 		    });
-		    // Checking function.
-			// FB.getLoginStatus(function(response) {
-			// 	if (response.status === 'connected') {
-			// 		// connected
-			// 		FB.logout(function(response) {
-			// 			console.log('Пользователь вышел как с сайта, так и с Facebook.')
-			// 		});
-			// 	} else if (response.status === 'not_authorized') {
-			// 		// not_authorized
-			// 		console.log('Вы не авторизированы!');
-			// 	} else {
-			// 	// not_logged_in
-			// 	console.log('Вам необходимо зарегистрироваться!');
-			// 	loginFB();
-			// 		// I've got here to work with login() function. I guess
-			// 		// that the FB.getLoginStatus is going to transfer to the
-			// 		// login() methof in the EVENTS. This is going to be the
-			// 		// checkup if the user is already registered.
-			// 	}
-			// });
 			break;
 		case "twitter":
 			twttr.anywhere(function (T) {
