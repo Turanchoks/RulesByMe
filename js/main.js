@@ -174,13 +174,14 @@ var NavBarView = Parse.View.extend({
 		'click #logout': 'logout',
 		'click #modal-login': 'modalLogin'
 	},
-	init: function() {
-		this.toRender = { isAuthorised: !!Parse.User.current() };
-		if(Parse.User.current())
-			this.toRender.name = Parse.User.current().get('author_name')
-	},
 	modalLogin: function() {
 		$('#login-modal').modal('toggle');
+	},
+	render: function() {
+		this.toRender = { isAuthorised: !!Parse.User.current() };
+		if(Parse.User.current())
+			this.toRender.name = Parse.User.current().get('author_name');
+		this.$el.html(this.template(this.toRender));
 	},
 	logout: function() {
 		Parse.User.logOut();
