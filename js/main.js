@@ -7,6 +7,7 @@ var Views = {}; // Object with id's of elements for Views
 for (var i = 0; i < positions.length; i++) {
 	Views[positions[i].getAttribute('id')] = null;
 }
+
 Parse.View = Parse.View.extend({
 	render: function() {
 		if(this.model && !this.collection) this.$el.html(this.template(this.model.toJSON()));
@@ -48,7 +49,6 @@ function submitRule() {
 		rule2: $('input#rule2').val(),
 		rule3: $('input#rule3').val(),
 		author: $('input#author').val(),
-		author_url: 'jlksjad.com'
 	};
 	Parse.Cloud.run('addRule', objectToPublish, {
 		success: function(obj) {
@@ -80,9 +80,9 @@ var RuleView = Parse.View.extend({
 	},
 	init: function() {
 		this.model.set('datetime', dateToString(this.model.createdAt));
-		this.model.set('author_url', 'http://rulesby.me/author/'+ this.model.get('user').id);
+		this.model.set('author_url', document.location.pathname + '#author/'+this.model.get('user').id);
 		this.model.set('vkShare', VK.Share.button({
-		  url: 'http://rulesby.me/rule/' + this.model.id,
+		  url: 'http://rulesby.me' + document.location.pathname + '#rule/' + this.model.id,
 		  title: 'Rules by ' + this.model.get('author_name'),
 		  description : '1. ' + this.model.get('rule1') + '\n' + ' 2. ' + this.model.get('rule2') + '\n' + ' 3. ' + this.model.get('rule3'),
 		  image: 'http://rulesby.me/img/logo_rbm.png',
@@ -101,7 +101,7 @@ var RuleView = Parse.View.extend({
         var increment = parseInt($(e.target).data('add-rating'));
         this.model.increment('rating', increment);
         this.undelegateEvents('click .ratingChange');
-        Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
+        Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment, "userID": Parse.User.current().id }, {
   			success: function(rule) {
 				var user = Parse.User.current();
 				var relation = user.relation("voted");
@@ -123,7 +123,7 @@ var RuleView = Parse.View.extend({
 	shareFB: function() {
 		FB.ui({
 	      method: 'feed',
-	      link: 'http://rulesby.me/rule/' + this.model.id,
+	      link: 'http://rulesby.me' + document.location.pathname + '#rule/' + this.model.id,
 	      picture: 'http://rulesby.me/img/logo_rbm.png',
 	      name: 'Rules by ' + this.model.get('author_name'),
 	      caption: 'RulesBy.Me',
@@ -137,6 +137,7 @@ var RuleCollectionView = Parse.View.extend({
 	el: $('#rulesList'),
 	init: function() {
 		this.collection = new RuleCollection();
+		this.collection.on('reset', this.render, this);
 	},
 	render: function() {
         this.$el.html("");
@@ -207,7 +208,7 @@ var LogInView = Parse.View.extend({
 });
 
 var RulesNav = Parse.View.extend({
-	el: $('#rulesnav'),
+	el: $('#rulesNav'),
 	template: Handlebars.compile($('#template-rulesNav').html()),
 	init: function() {
 
@@ -226,7 +227,7 @@ var AppView = Parse.View.extend({
 //////////////////////
 // HELPER FUNCTIONS //
 //////////////////////
-function queryRules(condition, userId) {
+function queryRules(condition, id) {
 	var now   = new Date(); // today
 	var query = new Parse.Query(RuleObject);
 	query.ascending('rating');
@@ -240,10 +241,18 @@ function queryRules(condition, userId) {
             var date = new Date(now.getFullYear(), now.getMonth(), now.getDate(),0,0,0,0);
             query.greaterThanOrEqualTo('createdAt', date);
             break;
-        case 'myRules':
+        case 'byAuthor':
+        	var author = new Parse.User();
+        	author.id = id;
+        	query.equalTo('user', author);
             break;
-        case 'userRules':
-            break;
+        case 'oneRule':
+        	query.equalTo('objectId', id);
+        	break;
+        case 'new':
+        	query.ascending('createdAt');
+        	query.limit(10);
+        	break;
 	}
 	return query.collection();
 }
@@ -260,7 +269,8 @@ var Router = Parse.Router.extend({
 		"author/:id": "rulesByAuthor",
 		"about": "about",
 		"best/:period": "getBest",
-        "myRules" : "myRules"
+        "myRules" : "myRules",
+        'newRules' : 'newRules'
 	},
 	initialize: function() {},
 	index: function() {
@@ -275,15 +285,49 @@ var Router = Parse.Router.extend({
         });
 	},
     myRules: function() {
-        console.log(Parse.User.current());  
+		queryRules('byAuthor', Parse.User.current().id).fetch({
+            success: function(collection) {
+                app.rulesView.collection = collection;
+                app.rulesView.render();
+            }, 
+            error: function() {
+            	console.error(arguments)
+            }
+        });
     },
-	oneRule: function(id) {},
+	oneRule: function(id) {
+		queryRules('oneRule', id).fetch({
+            success: function(collection) {
+                app.rulesView.collection = collection;
+                app.rulesView.render();
+            }, 
+            error: function() {
+            	console.error(arguments)
+            }
+        });		
+	},
 	about: function() {},
-    logOut: function() {
-
-    },
     rulesByAuthor: function(id) {
-
+    	queryRules('byAuthor', id).fetch({
+            success: function(collection) {
+                app.rulesView.collection = collection;
+                app.rulesView.render();
+            }, 
+            error: function() {
+            	console.error(arguments)
+            }
+        });
+    },
+    newRules: function() {
+    	queryRules('new').fetch({
+            success: function(collection) {
+                app.rulesView.collection = collection;
+                app.rulesView.render();
+            }, 
+            error: function() {
+            	console.error(arguments)
+            }
+        });    	
     }
 });
 //////////////

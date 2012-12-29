@@ -40,10 +40,8 @@
                     <div class="position" id="leftColumnSecondDiv"></div>
                 </div>
                 <div class="span6 rightColumn">
-                    <div class="position head" id="rulesnav"></div>
-                    <div >
-                        <ul class="position" id="rulesList" ></ul>
-                    </div>
+                    <div class="position head clearfix" id="rulesNav"></div>
+                    <ul class="position" id="rulesList" ></ul>
                 </div>                
             </div>
         </div>
@@ -67,8 +65,8 @@
             s.parentNode.insertBefore(g,s)}(document,'script'));
         </script>
 
-        <script type="text/template" id='template-rule'>
-            <div id="rule-id-{{objectId}}">
+        <script type="text/x-handlebars-template" id='template-rule'>
+            <div id="rule-id-{{objectId}}" class="clearfix">
                 <div class='author'>
                     Rule By <a href="{{author_url}}" class="authorUrl">{{author_name}}</a>
                     <div class="rating">
@@ -83,11 +81,11 @@
                     <li>{{rule3}}</li>
                 </ol>
                 <div class="ruleDatetime">{{datetime}}</div>
-                <div class="share">{{{vkShare}}} <img src='http://rulesby.me/img/facebook.png' class='shareFB'/></div>
+                <div class="share clearfix">{{{vkShare}}} <img src='http://rulesby.me/img/facebook.png' class='shareFB'/></div>
             </div>
         </script>
 
-        <script type="text/template" id='template-ruleCollection'>
+        <script type="text/x-handlebars-template" id='template-ruleCollection'>
             <ul>
                 {{#each ruleCollection}}
                 <div id="rule-id-{{objectId}}">
@@ -135,7 +133,7 @@
         </script>
 
         <script type="text/x-handlebars-template" id="template-rulesNav">
-            <div class="span2"><a href="#last">Последние</a></div>
+            <div class="span2"><a href="#newRules">Последние</a></div>
             <div class="span2"><a href="#best/week">Лучшие недели</a></div>
             <div class="span2"><a href="#best/month">Лучшие месяца</a></div>
         </script>
@@ -170,7 +168,7 @@
             </div>
         </script>
 
-        <script type = "text/template" id="template-gifLoader">
+        <script type = "text/x-handlebars-template" id="template-gifLoader">
             <div class="loading"><img src="img/ajax-loader.gif"/></div>
         </script>
         

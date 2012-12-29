@@ -17,7 +17,7 @@
 }
 ul#rulesList {
   list-style: none;
-  margin:0;
+  margin: 15px 0 0 0;
 }
 
 .rules-time {
@@ -39,16 +39,16 @@ body {
   position: relative;
   border-radius: 5px;  
 }
-.rulesNav ul {
+#rulesNav ul {
   margin:5px;
   list-style:none;
 }
-.rulesNav ul li {
+#rulesNav ul li {
     display:inline;
     padding:15px;
 }
 
-.rulesNav .span2 {
+#rulesNav .span2 {
     margin-left: 0;
     text-align:center;
     padding: 5px 6px;
@@ -87,15 +87,17 @@ body {
   padding: 0px 0px 0px 25px; 
   color: gray;
   font-style: italic;
+  float:left;
+  line-height: 24px;
 }
 
-.rulesNav a{
+#rulesNav a{
   color:#F89406;
   font-weight: bold;
   padding:10px;
   font-size: 16px;
 }
-.rulesNav a:hover,.rulesNav a:focus{
+#rulesNav a:hover,#rulesNav a:focus{
   color:#F89406;
   font-weight: bold;
   text-decoration: none;
@@ -109,7 +111,13 @@ a.nounderline{
   margin: 10px;
   /*border: 0.1em dotted black;*/
 }
-
+.share {
+  float: right;
+}
+.share img {
+  width:24px;
+  height:24px;
+}
 /* ==========================================================================
    Author's custom styles
    ========================================================================== */
