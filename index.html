@@ -17,7 +17,7 @@
             }
         </style>
         <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
-        <link rel="stylesheet" href="css/main.css">
+        <!-- <link rel="stylesheet" href="css/main.css"> -->
         <link rel="stylesheet/less" type="text/css" href="css/mainStyles.less">
         <link rel="stylesheet" href="css/fontello.css">
         <script src="js/vendor/modernizr-2.6.1-respond-1.1.0.min.js"></script>
@@ -69,17 +69,18 @@
             <div id="rule-id-{{objectId}}" class="clearfix">
                 <div class='author'>
                     Rule By <a href="{{author_url}}" class="authorUrl">{{author_name}}</a>
-                    <div class="rating">
-                        <a class="ratingChange" data-add-rating="1">+</a>
-                        <span class="ratingValue">{{rating}}</span>
-                        <a class="ratingChange" data-add-rating="-1">–</a>                        
-                    </div>
+
                 </div>
                 <ol class='rulesList'>
                     <li>{{rule1}}</li>
                     <li>{{rule2}}</li>
                     <li>{{rule3}}</li>
                 </ol>
+                <div class="rating">
+                    <a class="ratingChange" data-add-rating="1">+</a>
+                    <span class="ratingValue">{{rating}}</span>
+                    <a class="ratingChange" data-add-rating="-1">–</a>                        
+                </div>
                 <div class="ruleDatetime">{{datetime}}</div>
                 <div class="share clearfix">{{{vkShare}}} <img src='http://rulesby.me/img/facebook.png' class='shareFB'/></div>
             </div>
@@ -91,17 +92,17 @@
                 <div id="rule-id-{{objectId}}">
                     <div class='author'>
                         Rule By <a href="{{author.url}}" class="authorUrl">{{author_name}}</a>
-                        <div class="rating">
-                            <a class="ratingChange" data-add-rating="1">+</a>
-                            <span class="ratingValue">{{rating}}</span>
-                            <a class="ratingChange" data-add-rating="-1">–</a>                        
-                        </div>
                     </div>
                     <ol class='rulesList'>
                         <li>{{rule1}}</li>
                         <li>{{rule2}}</li>
                         <li>{{rule3}}</li>
                     </ol>
+                    <div class="rating">
+                        <a class="ratingChange" data-add-rating="1">+</a>
+                        <span class="ratingValue">{{rating}}</span>
+                        <a class="ratingChange" data-add-rating="-1">–</a>                        
+                    </div>
                     <div class="ruleDatetime">{{datetime}}</div>
                 </div>
                 {{/each}}
@@ -133,9 +134,9 @@
         </script>
 
         <script type="text/x-handlebars-template" id="template-rulesNav">
-            <div class="span2"><a href="#newRules">Последние</a></div>
-            <div class="span2"><a href="#best/week">Лучшие недели</a></div>
-            <div class="span2"><a href="#best/month">Лучшие месяца</a></div>
+            <a href="#newRules"><div class="span2">Последние</div></a>
+            <a href="#best/week"><div class="span2">Лучшие недели</div></a>
+            <a href="#best/month"><div class="span2">Лучшие месяца</div></a>
         </script>
 
         <script type="text/x-handlebars-template" id="template-navBar">

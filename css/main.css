@@ -52,6 +52,7 @@ body {
     margin-left: 0;
     text-align:center;
     padding: 5px 6px;
+    background-color: black;
 }
 .loading {
     text-align:center;
