@@ -1,0 +1,148 @@
+// Цвета для большинства наших решений.
+@mainColor: #F89406;
+@cDarkOrange: #AB6503;
+@cLightBlue: #85F5FF;
+@cDarkBlue: #3FB9C4;
+@bgGrey: #eee;
+// Соотношения высот.
+@dh: 4em;
+@h: 2em;
+@sh: 1.5em;
+@o: 1em;
+
+
+body {
+  font-size: 12px;
+}
+
+// Эта часть отвечает за навигационную панельку сверху.
+#rulesNav {
+  height: @h;
+  font-size: @sh;
+}
+
+.span2 {
+    color: @mainColor;
+    margin-left: 0;
+    text-align:center;
+    width: (100% / 3);
+    height: 100%;
+    padding-top: 10px;
+    &:hover {
+        color: white;
+        background-color: @mainColor;
+        text-decoration: none;
+    }
+    &:focus {
+      color: white;
+      background-color: @mainColor;
+      text-decoration: none;
+    }
+}
+
+// Класс создан специально для того, чтобы отмечать верхней границей выбранные элементы.
+// Пока не используется. Будет использоваться, когда разберусь, как сделать проверку.
+.choosen {
+  border-top: medium solid @mainColor;
+}
+
+// Отображение блока с правилом.
+ul#rulesList {
+  list-style: none;
+  margin:0;
+}
+
+#rulesList {
+  .rule:nth-child(odd) {
+    background-color: @bgGrey;
+  }
+}
+
+.rule {
+  padding: 10px 20px;
+  position: relative;
+}
+
+// Время создания правила.
+.ruleDatetime {
+  font-size: @o;
+  // padding: 0px 0px 0px 25px; 
+  color: @cDarkBlue;
+  font-style: italic;
+}
+
+// Параметры, связанные с надписью Rules By
+// и последующим именем автора.
+.author {
+  line-height: @h;
+  font-size: @sh;
+}
+.authorUrl {
+  color: @mainColor;
+  font-weight: bold;
+  font-size: @o;
+}
+
+// В данном случае можно будет оптимизировать код, если немного переименовать классы.
+// Оставить одно общее название rating, добавить дополнительные Value, Change...
+.rating {
+  height: @h;
+  font-size: @h;
+  position: absolute;
+  top: 10%;
+  right: 10%;
+}
+
+.ratingValue {
+  color: black;
+  vertical-align: middle;
+}
+
+.ratingChange {
+  cursor: pointer;
+  width: 20px;
+  vertical-align: middle;
+  // display: inline-block;
+  text-align: center;
+  color: @mainColor;
+
+  &:hover {
+    text-decoration: none;
+    color: white;
+    background-color: @mainColor;
+  }
+  &:focus {
+    text-decoration: none;
+    color: white;
+    background-color: @mainColor;
+  }
+}
+
+
+// Даный момент отвечает за отображение картинки загрузки.
+.loading {
+    text-align:center;
+    display:none;
+}
+
+// Чёрт его знает, что это.
+a.nounderline{ 
+  text-decoration: none;
+  color: @mainColor;
+  margin: 10px;
+}
+
+// Соединил вместе параметры .share
+
+.share {
+  float: right;
+
+  img {
+    width: @h;
+    height: @h;
+  }
+}
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
