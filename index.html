@@ -128,7 +128,7 @@
             {{#if isAuthorised}}
                 <a class="btn btn-large btn-warning publish">ОПУБЛИКОВАТЬ</a>
             {{else}}
-                <a class="btn btn-large btn-warning modal-login publish">ВОЙТИ И ОПУБЛИКОВАТЬ</a>
+                <a class="btn btn-large btn-warning publish">ВОЙТИ И ОПУБЛИКОВАТЬ</a>
             {{/if}}
         </script>
 
@@ -185,6 +185,13 @@
                     <a href="#" class="nounderline"><i class="icon-vk"></i></a>
                     <a href="#" class="nounderline"><i class="icon-gplus"></i><a>
                 </p>
+            </div>
+        </script>
+
+        <script type="text/x-handlebars-template" id="template-errorView">
+            <div class="alert alert-error">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{error_text}}
             </div>
         </script>
 
