@@ -43,22 +43,59 @@ function dateToString(date) {
 }
 
 function submitRule() {
-	var now = new Date();
-	var objectToPublish = {
-		rule1: $('input#rule1').val(),
-		rule2: $('input#rule2').val(),
-		rule3: $('input#rule3').val(),
-		author: $('input#author').val(),
-	};
-	Parse.Cloud.run('addRule', objectToPublish, {
-		success: function(obj) {
-			$('.submission').find('input').val(''); // Clear inputs
-			console.log(obj);
-		},
-		error: function(error, obj) {
-			console.error(JSON.parse(error.message).message);
-		}
-	});
+	if(!Parse.User.current()) 	{
+		$('#login-modal').modal('toggle');
+		return;
+	}
+	else {
+		// if(Views['leftColumnHead']) Views['leftColumnHead'].remove();
+
+		var now = new Date();
+		var objectToPublish = {
+			rule1: $('input#rule1').val(),
+			rule2: $('input#rule2').val(),
+			rule3: $('input#rule3').val(),
+			author: $('input#author').val()
+		};
+
+
+
+		for (var i = 1; i < 4; i++) {
+			if($('input#rule' + i).parent().hasClass("error")) {
+				$('input#rule' + i).parent().removeClass("error");
+			}
+
+			if(trim(objectToPublish['rule' + i]).length < 3) {
+				if (app.error) {
+					app.error.initialize("Правило не может быть меньше 3-х букв!");
+				}
+				else {
+					app.error = new ErrorView("Правило не может быть меньше 3-х букв!");
+				}
+				$('input#rule' + i).parent().addClass("error");
+				return;
+			}
+			if ( trim(objectToPublish['rule' + i]).match(/<\/*[a-z][^>]+?>/gi) ) {
+				if (app.error) {
+					app.error.initialize("Правило не может быть содержать html-разметку!");
+				}
+				else {
+					app.error = new ErrorView("Правило не может быть содержать html-разметку!");
+				}
+				$('input#rule' + i).parent().addClass("error");
+				return;  				
+			}
+		};
+
+		Parse.Cloud.run('addRule', objectToPublish, {
+			success: function(obj) {
+				$('.submission').find('input').val(''); // Clear inputs
+			},
+			error: function(error, obj) {
+				console.error(JSON.parse(error.message).message);
+			}
+		});
+	}
 }
 ////////////////
 // STRUCTURE  //
@@ -96,29 +133,31 @@ var RuleView = Parse.View.extend({
 	ratingChange: function(e) {
 		if(!Parse.User.current()) 	{
 			$('#login-modal').modal('toggle');
-			return
+			return;
 		}
-        var increment = parseInt($(e.target).data('add-rating'));
-        this.model.increment('rating', increment);
-        this.undelegateEvents('click .ratingChange');
-        Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment, "userID": Parse.User.current().id }, {
-  			success: function(rule) {
-				var user = Parse.User.current();
-				var relation = user.relation("voted");
-				relation.add(rule);
-				user.save(null, {
-					success: function(s) {
-						console.log(s);
-					},
-					error: function(e) {
-						console.log(e);
-					}
-				});
-  			},
-  			error: function(error) {
-  				console.error(error);
-  			}
-		});
+		else {
+	        var increment = parseInt($(e.target).data('add-rating'));
+	        this.model.increment('rating', increment);
+	        this.undelegateEvents('click .ratingChange');
+	        Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
+	  			success: function(rule) {
+					var user = Parse.User.current();
+					var relation = user.relation("voted");
+					relation.add(rule);
+					user.save(null, {
+						success: function(s) {
+							console.log(s);
+						},
+						error: function(e) {
+							console.log(e);
+						}
+					});
+	  			},
+	  			error: function(error) {
+	  				console.error(error);
+	  			}
+			});
+		}
 	},
 	shareFB: function() {
 		FB.ui({
@@ -162,7 +201,7 @@ var SubmitRuleView = Parse.View.extend({
         	isAuthorised: !!Parse.User.current(), 
         	username: Parse.User.current() ?  Parse.User.current().get('author_name') : ""		
 		}
-	},	
+	},
 	submitRule : submitRule
 });
 
@@ -216,6 +255,21 @@ var RulesNav = Parse.View.extend({
 	}
 });
 
+var ErrorView = Parse.View.extend({
+	el: $('#leftColumnHead'),
+	template: Handlebars.compile($('#template-errorView').html()),
+	initialize: function(error) {
+		Views[this.el.getAttribute('id')] = this;
+		this.toRender = {error_text: error};
+		if(this.model) this.model.on('change', this.render, this);
+		if(this.collection) this.collection.on('change', this.render, this);
+		if(this.collection) this.collection.on('add', this.render, this);
+		this.render();	
+	}
+});
+
+
+
 var AppView = Parse.View.extend({
 	render: function() {
 		this.navBar = new NavBarView();
@@ -258,8 +312,16 @@ function queryRules(condition, id) {
 	return query.collection();
 }
 
-
-
+function trim (str) {
+	str = str.replace(/^\s+/, '');
+	for (var i = str.length - 1; i >= 0; i--) {
+		if (/\S/.test(str.charAt(i))) {
+			str = str.substring(0, i + 1);
+			break;
+		}
+	}
+	return str;
+}
 ////////////
 // ROUTER //
 ////////////
@@ -341,10 +403,8 @@ function loginWith(provider, user)
 	query.equalTo(provider + "_id", user[provider + "_id"]);
 	query.find({
 		success: function(Users) {
-			console.log(Users);
 			if (!Users.length) {
 				var newUser = new Parse.User(user);
-				console.log(newUser);
 				newUser.signUp(null,
 				{
 					success: function(user) {
@@ -356,8 +416,21 @@ function loginWith(provider, user)
 				})
 			}
 			else {
-				Users[0]._handleSaveResult(true);
-				re_render();
+				Parse.Cloud.run("someFunc", {userID: Users[0].id, access: user.password}, {
+					success: function(newUser) {
+						Parse.User.logIn(user.username, user.password, {
+							success: function() {
+								re_render();
+							},
+							error: function() {
+
+							}
+						})
+					},
+					error: function(newUser, error) {
+
+					}
+				});
 			}
 		},
 		error: function(Users, error) {
