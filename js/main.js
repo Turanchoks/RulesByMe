@@ -136,25 +136,22 @@ var RuleView = Parse.View.extend({
 			return;
 		}
 		else {
+			// if(Views['leftColumnHead']) Views['leftColumnHead'].remove();
+
 	        var increment = parseInt($(e.target).data('add-rating'));
-	        this.model.increment('rating', increment);
+	  		this.model.increment('rating', increment);
 	        this.undelegateEvents('click .ratingChange');
 	        Parse.Cloud.run('ratingChange', { "RuleID": this.model.id, "increment": increment }, {
 	  			success: function(rule) {
-					var user = Parse.User.current();
-					var relation = user.relation("voted");
-					relation.add(rule);
-					user.save(null, {
-						success: function(s) {
-							console.log(s);
-						},
-						error: function(e) {
-							console.log(e);
-						}
-					});
+
 	  			},
 	  			error: function(error) {
-	  				console.error(error);
+					if (app.error) {
+						app.error.initialize(error.message);
+					}
+					else {
+						app.error = new ErrorView(error.message);
+					}
 	  			}
 			});
 		}
@@ -196,11 +193,12 @@ var SubmitRuleView = Parse.View.extend({
 	events: {
 		'click .publish' : 'submitRule'
 	},
-	init: function() {
+	render: function() {
 		this.toRender = {
         	isAuthorised: !!Parse.User.current(), 
         	username: Parse.User.current() ?  Parse.User.current().get('author_name') : ""		
-		}
+		};
+		this.$el.html(this.template(this.toRender));
 	},
 	submitRule : submitRule
 });
@@ -452,12 +450,8 @@ function socialAuth(provider) {
 	$('#login-modal').modal('hide');
 	switch(provider) {
 		case "facebook":
-			// Checking is the guy is logged or not.
-			// Login function
 			FB.login(function(response) {
 		        if (response.authResponse) {
-		            // connected
-		            // Creating new user on the server.
 				    FB.api('/me', function(response) {
 					    var newUser = {
 					    	username:		response.id,
@@ -465,13 +459,9 @@ function socialAuth(provider) {
 					    	facebook_id: 	response.id,
 					    	author_name:	response.name,
 					    	// userpic: 		response.picture,
-					    	// email:  	'gaga@gaga.com',
 					    };
 					    loginWith("facebook", newUser);
 				    });
-		        }
-		        else {
-		            // cancelled
 		        }
 		    });
 			break;
@@ -479,7 +469,6 @@ function socialAuth(provider) {
 			twttr.anywhere(function (T) {
 				T.signIn();
 				T.bind("authComplete", function (e, user) {
-      				// triggered when auth completed successfully
 					var newUser = {
 						username: user.idStr,
 						password: user.profileBackgroundColor,
@@ -540,10 +529,6 @@ function re_render() {
 function logout () {
 	Parse.User.logOut();
 	re_render();
-}
-
-function notify() {
-	alert("change auth");
 }
 //////////////
 // ON START //
