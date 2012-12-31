@@ -20,7 +20,7 @@ function trim (str) {
 
 Parse.Cloud.define("ratingChange", function(request, response) {
 	if (request.params.increment != 1 && request.params.increment != -1) {
-		response.success("cheat!");
+		response.error("Нельзя просто так взять, и добавить больше 1 к рейтингу");
 		return;
 	}
 
@@ -28,19 +28,30 @@ Parse.Cloud.define("ratingChange", function(request, response) {
 		request.user.relation("voted").query().get(request.params.RuleID, {
 			success: function(Rule) {
 				console.log("Rules was voted");
+				response.error("Вы уже голосовали за данное правило.");
 			},
 			error: function(obj, error) {
 				console.log("Rules wasn't voted by user");
 				var ruleQuery = new Parse.Query("Rule");
 				ruleQuery.get(request.params.RuleID, {
 					success: function(Rule) {
-						Rule.increment("rating", request.params.increment);
-						console.log("increment");
-						Rule.save();	
-						response.success(Rule);			
+						request.user.relation("voted").add(Rule);
+						request.user.save(null, {
+							success: function() {
+								Rule.increment("rating", request.params.increment);
+								console.log("increment");
+								Rule.save();
+								response.success(Rule);
+							},
+							error: function(user, error) {
+								console.error(error);
+								response.error("Простите, проблемы с сервером");
+							}
+						});
 					},
 					error: function() {
-
+						console.error("Some troubles when get rule");
+						response.error("Простите, проблемы с сервером");
 					}
 				});
 			}
@@ -48,6 +59,7 @@ Parse.Cloud.define("ratingChange", function(request, response) {
 	}
 	else {
 		console.error("There is no user in request");
+		response.error("Залогинтесь, пожалуйста");
 	}
 });
 
@@ -77,12 +89,12 @@ Parse.Cloud.define("addRule", function(request, response) {
 			},
 			error: function(error, obj) {
 				response.error(error, obj);
-				// throw new Error(error);
 			}
 		});
 	}
 	else {
 		console.error("There is no user in request");
+		response.error("Залогинтесь, пожалуйста");
 	}
 });
 
