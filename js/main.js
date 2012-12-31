@@ -325,7 +325,7 @@ function trim (str) {
 ////////////
 var Router = Parse.Router.extend({
     routes: {
-		"": "index",
+		"": "newRules",
 		"rule/:id": "oneRule",
 		"author/:id": "rulesByAuthor",
 		"about": "about",
