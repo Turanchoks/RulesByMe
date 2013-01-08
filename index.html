@@ -114,16 +114,16 @@
             <div class="submission">
                 <div class="input-prepend control-group">
                     <span class="add-on">Rules by</span>
-                    <input type="text" id='author' value='{{username}}'>
+                    <input type="text" id='author' value='{{username}}' disabled>
                 </div>
                 <div class="input-prepend control-group">
-                    <span class="add-on">1</span><input type="text" id='rule1'>
+                    <span class="add-on">1</span><input type="text" id='rule1' maxlength="140">
                 </div>
                 <div class="input-prepend control-group">
-                    <span class="add-on">2</span><input type="text" id='rule2'>
+                    <span class="add-on">2</span><input type="text" id='rule2' maxlength="140">
                 </div>
                 <div class="input-prepend control-group">
-                    <span class="add-on">3</span><input type="text" id='rule3'>
+                    <span class="add-on">3</span><input type="text" id='rule3' maxlength="140">
                 </div>                        
             </div>
             {{#if isAuthorised}}
@@ -192,14 +192,34 @@
         <script type="text/x-handlebars-template" id="template-errorView">
             <div class="alert alert-error">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
-                {{error_text}}
+                  {{#each error_text}}
+                    {{this}}<br/>
+                  {{/each}}
             </div>
+        </script>
+
+        <script type="text/x-handlebars-template" id="template-addedView">
+            {{#if error}}
+                <h1>Sorry, server not responding :(</h1>
+                <h5>please, try again later</h5>
+            {{else}}
+                <h1>Ура вы добавили правило!</h1>
+                <div class="input-append">
+                    <a href="{{url}}/#rule/{{id}}" ><input type="text" id="url" value="{{url}}/#rule/{{id}}" class='span4' disabled></a>
+                    <button class="btn" type="button" id="copy">Copy!</button>
+                </div>
+                <a class="btn btn-info again">Хотите добавить еще правил?</a>
+                <a class="btn btn-info" href="{{url}}/#myRules">Страница моих правил</a>
+                <h4>Поделитесь ссылочкой ;-)</h4> 
+                {{{vkShare}}} <img src='http://rulesby.me/img/facebook.png' class='shareFB'/>
+            {{/if}}
         </script>
 
         <!-- Handlebars init -->
         <script type="text/javascript" src="js/handlebars.js"></script>
         <!-- Parse init -->
         <script type="text/javascript" src="js/main.js"></script>
+        
         <!-- VK Init -->
         <script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript"></script>
         <script type="text/javascript" src="http://vkontakte.ru/js/api/share.js?9" charset="windows-1251"></script>
