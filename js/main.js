@@ -16,7 +16,7 @@ Parse.View = Parse.View.extend({
 		else this.$el.html(this.template());
 	},
 	initialize: function() {
-		if(Views[this.el.getAttribute('id')]) Views[this.el.getAttribute('id')].remove;
+		if(Views[this.el.getAttribute('id')]) Views[this.el.getAttribute('id')].remove;	
 		Views[this.el.getAttribute('id')] = this;
 		if(this.init) this.init();
 		if(this.model) this.model.on('change', this.render, this);
@@ -34,7 +34,7 @@ Parse.initialize("7NWULxIRFzuMWrQ6bX1O8mm357Nz7jfHEWXhPevn", "yQmxvt5eKgJfbSCePp
 function dateToString(date) {
 	var trimmedDate = date.getFullYear().toString();
 	trimmedDate += '-';
-	trimmedDate += (date.getMonth().toString().length == 1) ? '0'+date.getMonth().toString() : date.getMonth().toString();
+	trimmedDate += (date.getMonth().toString().length == 1) ? '0'+ (date.getMonth()+1).toString() : (date.getMonth()+1).toString();
 	trimmedDate += '-';
 	trimmedDate += (date.getDate().toString().length == 1) ? '0'+date.getDate().toString() : date.getDate().toString();
 	trimmedDate += ' ';
@@ -105,7 +105,7 @@ function submitRule() {
 ////////////////
 var RuleObject = Parse.Object.extend('Rule',{});
 var RuleCollection = Parse.Collection.extend({
- 	model: RuleObject,
+ 	model: RuleObject
 });
 ///////////
 // VIEWS //  
@@ -161,7 +161,7 @@ var RuleView = Parse.View.extend({
 	      caption: 'RulesBy.Me',
 	      properties : { 1 : this.model.get('rule1'), 2 : this.model.get('rule1'), 3 : this.model.get('rule1')}
 	    }, function() {
-	    	console.log('succes FB');
+	    	console.log('success FB');
 	    })
 	}
 });
@@ -316,24 +316,51 @@ var addedView = Parse.View.extend({
 	}
 });
 
-
+var PaginationView = Parse.View.extend({
+	el: $('#pagination'),
+	template: Handlebars.compile($('#template-pagination').html()),
+	initialize: function() {
+		Views[this.el.getAttribute('id')] = this;
+		this.render();
+	},
+	render: function(where, page) {
+		if(page) {
+			var toRender = {
+				prev: '#'+where+'/'+(page-1),
+				next: '#'+where+'/'+(page+1)
+			};			
+		} else {
+			var toRender = {
+				next: '#'+where+'/1',
+				isFirst: true
+			};				
+		};
+		this.$el.html(this.template(toRender));
+	}
+});
 
 var AppView = Parse.View.extend({
 	render: function() {
-		this.navBar = new NavBarView();
-        this.rulesNav = new RulesNav();
-        this.rulesView = new RuleCollectionView();
-        this.submitRule = new SubmitRuleView();
-		this.LogInView = new LogInView();
+		this.navBar         = new NavBarView();
+		this.rulesNav       = new RulesNav();
+		this.rulesView      = new RuleCollectionView();
+		this.submitRule     = new SubmitRuleView();
+		this.LogInView      = new LogInView();
+		this.paginationView = new PaginationView();
 	}
 });
+
 //////////////////////
 // HELPER FUNCTIONS //
 //////////////////////
-function queryRules(condition, id) {
+function queryRules(condition, options) {
 	var now   = new Date(); // today
 	var query = new Parse.Query(RuleObject);
+	var rulesPerFetch = 5;
 	query.ascending('rating');
+	query.limit(rulesPerFetch);
+	query.descending('createdAt');
+	if(options.page) query.skip(rulesPerFetch*options.page);
 	switch(condition) {
 		case 'month':
 		    var date = new Date(now.getFullYear(), now.getMonth(), 1,0,0,0,0);
@@ -346,15 +373,13 @@ function queryRules(condition, id) {
             break;
         case 'byAuthor':
         	var author = new Parse.User();
-        	author.id = id;
+        	author.id = options.id;
         	query.equalTo('user', author);
             break;
         case 'oneRule':
-        	query.equalTo('objectId', id);
+        	query.equalTo('objectId', options.id);
         	break;
         case 'new':
-        	query.ascending('createdAt');
-        	query.limit(10);
         	break;
 	}
 	return query.collection();
@@ -381,26 +406,34 @@ var Router = Parse.Router.extend({
 		"author/:id": "rulesByAuthor",
 		"about": "about",
 		"best/:period": "getBest",
+		"best/:period/:page": "getBest",
         "myRules" : "myRules",
-        'newRules' : 'newRules'
+        "newRules" : 'newRules',
+        "newRules/:page": "newRules",
 	},
 	initialize: function() {},
 	index: function() {
 
 	},
-	getBest: function(period) {
-        queryRules(period).fetch({
+	getBest: function(period,page) {
+		if(page) var page = parseInt(Math.abs(page));
+        queryRules(period, {page: page}).fetch({
             success: function(collection) {
-                app.rulesView.collection = collection;
+                app.rulesView.collection = collection.sortBy(function(rule) {
+                	return rule.get('createdAt')
+                });;
                 app.rulesView.render();
+                app.paginationView.render("best/"+period, page);
             }
         });
 	},
     myRules: function() {
-		queryRules('byAuthor', Parse.User.current().id).fetch({
+    	if(page) var page = parseInt(Math.abs(page));
+		queryRules('byAuthor', {id: Parse.User.current().id, page: page}).fetch({
             success: function(collection) {
                 app.rulesView.collection = collection;
                 app.rulesView.render();
+                app.paginationView.render("myRules", page);
             }, 
             error: function() {
             	console.error(arguments)
@@ -408,7 +441,7 @@ var Router = Parse.Router.extend({
         });
     },
 	oneRule: function(id) {
-		queryRules('oneRule', id).fetch({
+		queryRules('oneRule', {id:id}).fetch({
             success: function(collection) {
                 app.rulesView.collection = collection;
                 app.rulesView.render();
@@ -420,21 +453,29 @@ var Router = Parse.Router.extend({
 	},
 	about: function() {},
     rulesByAuthor: function(id) {
-    	queryRules('byAuthor', id).fetch({
+    	if(page) var page = parseInt(Math.abs(page));
+    	queryRules('byAuthor', {id:id, page: page}).fetch({
             success: function(collection) {
-                app.rulesView.collection = collection;
+                app.rulesView.collection = collection.sortBy(function(rule) {
+                	return rule.get('createdAt')
+                });
                 app.rulesView.render();
+                app.paginationView.render("author/"+id, page);
             }, 
             error: function() {
             	console.error(arguments)
             }
         });
     },
-    newRules: function() {
-    	queryRules('new').fetch({
+    newRules: function(page) {
+		if(page) var page = parseInt(Math.abs(page));
+    	queryRules('new', {page: page}).fetch({
             success: function(collection) {
-                app.rulesView.collection = collection;
+                app.rulesView.collection = collection.sortBy(function(rule) {
+                	return rule.get('createdAt')
+                });
                 app.rulesView.render();
+                app.paginationView.render("newRules", page);
             }, 
             error: function() {
             	console.error(arguments)
@@ -445,8 +486,7 @@ var Router = Parse.Router.extend({
 //////////////
 //  EVENTS  //
 //////////////
-function loginWith(provider, user)
-{
+function loginWith(provider, user) {
 	console.log(user);
 	var query = new Parse.Query('User');
 	query.equalTo(provider + "_id", user[provider + "_id"]);
