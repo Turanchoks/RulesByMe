@@ -38,10 +38,12 @@
                     <div class="position head" id="leftColumnHead"></div>
                     <div class="position" id="leftColumnFirstDiv"></div>
                     <div class="position" id="leftColumnSecondDiv"></div>
+                    <a href="http://vkontakte.ru/share.php?url=http://mysite.com" target="_blank">Поделиться ВКонтакте</a>
                 </div>
                 <div class="span6 rightColumn">
                     <div class="position head clearfix" id="rulesNav"></div>
                     <ul class="position" id="rulesList" ></ul>
+                    <div id="pagination" class="position"></div>
                 </div>                
             </div>
         </div>
@@ -63,6 +65,13 @@
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
             g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
             s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+
+        <script type="text/x-handlebars-template" id='template-pagination'>
+            <ul class="pager">
+              <li><a href="{{prev}}" {{#if isFirst}}class="hidden"{{/if}}>Previous</a></li>
+              <li><a href="{{next}}">Next</a></li>
+            </ul>
         </script>
 
         <script type="text/x-handlebars-template" id='template-rule'>
