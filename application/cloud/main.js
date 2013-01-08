@@ -80,7 +80,7 @@ Parse.Cloud.define("addRule", function(request, response) {
 			rule3: request.params.rule3,
 			author_name: request.params.author,
 			rating: 0,
-			user: request.user
+			user: request.user.get("num_id")
 		});
 
 		ruleObjectToPublish.save({
@@ -119,6 +119,48 @@ Parse.Cloud.define("someFunc", function(request, response) {
 			response.error();
 		}
 	});
+});
+
+Parse.Cloud.beforeSave("Rule", function(request, response) {
+  if (request.object.get("num_id")) {
+    response.success();
+  }
+  else {
+  	var query = new Parse.Query("Cid");
+  	query.get("tG7U4Bny59", {
+  		success: function(cid_obj) {
+  			var num_id = cid_obj.get("rule") + 1;
+  			request.object.set("num_id", num_id);
+  			cid_obj.set("rule", num_id);
+  			cid_obj.save();
+  			response.success();
+  		},
+  		error: function(cid_obj, error) {
+  			console.error(error);
+  		}
+  	})
+  }
+});
+
+Parse.Cloud.beforeSave("_User", function(request, response) {
+  if (request.object.get("num_id")) {
+    response.success();
+  }
+  else {
+  	var query = new Parse.Query("Cid");
+  	query.get("tG7U4Bny59", {
+  		success: function(cid_obj) {
+  			var num_id = cid_obj.get("user") + 1;
+  			request.object.set("num_id", num_id);
+  			cid_obj.set("user", num_id);
+  			cid_obj.save();
+  			response.success();
+  		},
+  		error: function(cid_obj, error) {
+  			console.error(error);
+  		}
+  	})
+  }
 });
 
 Parse.Cloud.define("Logger", function(request, response) {
