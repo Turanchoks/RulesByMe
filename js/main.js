@@ -25,12 +25,11 @@ Parse.View = Parse.View.extend({
 		this.render();	
 	},
 	remove: function() { // change standart behavior of View.remove() to make it detach events
-		this.$el.empty().detach();
+		this.$el.empty().undelegate();
 		return this;
 	}
 });
 Parse.initialize("7NWULxIRFzuMWrQ6bX1O8mm357Nz7jfHEWXhPevn", "yQmxvt5eKgJfbSCePpBM040ZUMj3iNHiucWBlpas");
-
 
 function dateToString(date) {
 	var trimmedDate = date.getFullYear().toString();
@@ -49,7 +48,7 @@ function submitRule() {
 		return;
 	}
 	else {
-		// if(Views['leftColumnHead']) Views['leftColumnHead'].remove();
+		if (app.error) app.error.remove(); 
 
 		var now = new Date();
 		var objectToPublish = {
@@ -59,7 +58,7 @@ function submitRule() {
 			author: $('input#author').val()
 		};
 
-
+		var error = [];
 
 		for (var i = 1; i < 4; i++) {
 			if($('input#rule' + i).parent().hasClass("error")) {
@@ -67,33 +66,36 @@ function submitRule() {
 			}
 
 			if(trim(objectToPublish['rule' + i]).length < 3) {
-				if (app.error) {
-					app.error.initialize("Правило не может быть меньше 3-х букв!");
-				}
-				else {
-					app.error = new ErrorView("Правило не может быть меньше 3-х букв!");
-				}
+				error.push("Правило №"+i+" не может быть меньше 3-х букв!");
 				$('input#rule' + i).parent().addClass("error");
-				return;
 			}
+
 			if ( trim(objectToPublish['rule' + i]).match(/<\/*[a-z][^>]+?>/gi) ) {
-				if (app.error) {
-					app.error.initialize("Правило не может быть содержать html-разметку!");
-				}
-				else {
-					app.error = new ErrorView("Правило не может быть содержать html-разметку!");
-				}
+				error.push("Правило №"+i+" не может быть содержать html-разметку!");
 				$('input#rule' + i).parent().addClass("error");
-				return;  				
 			}
+
+			if (trim(objectToPublish['rule' + i]).length > 140) {
+				error.push("Правило №"+i+" не может быть больше 140 символов!");
+				$('input#rule' + i).parent().addClass("error");	
+			}
+
 		};
+
+		if (error != "") {
+			app.error = new ErrorView(error);
+			return;
+		}
+
+		$("leftColumnFirstDiv").html(Handlebars.compile($('#template-gifLoader').html()));
 
 		Parse.Cloud.run('addRule', objectToPublish, {
 			success: function(obj) {
 				$('.submission').find('input').val(''); // Clear inputs
+				app.addedView = new addedView(obj);
 			},
 			error: function(error, obj) {
-				console.error(JSON.parse(error.message).message);
+				app.addedView = new addedView(obj, error);	
 			}
 		});
 	}
@@ -137,8 +139,6 @@ var RuleView = Parse.View.extend({
 			return;
 		}
 		else {
-			// if(Views['leftColumnHead']) Views['leftColumnHead'].remove();
-
 	        var increment = parseInt($(e.target).data('add-rating'));
 	  		this.model.increment('rating', increment);
 	        this.undelegateEvents('click .ratingChange');
@@ -147,12 +147,7 @@ var RuleView = Parse.View.extend({
 
 	  			},
 	  			error: function(error) {
-					if (app.error) {
-						app.error.initialize(error.message);
-					}
-					else {
-						app.error = new ErrorView(error.message);
-					}
+					app.error = new ErrorView([error.message]);
 	  			}
 			});
 		}
@@ -166,7 +161,7 @@ var RuleView = Parse.View.extend({
 	      caption: 'RulesBy.Me',
 	      properties : { 1 : this.model.get('rule1'), 2 : this.model.get('rule1'), 3 : this.model.get('rule1')}
 	    }, function() {
-	    	console.log('success FB')
+	    	console.log('success FB');
 	    })
 	}
 });
@@ -258,12 +253,66 @@ var ErrorView = Parse.View.extend({
 	el: $('#leftColumnHead'),
 	template: Handlebars.compile($('#template-errorView').html()),
 	initialize: function(error) {
+		if(Views[this.el.getAttribute('id')]) Views[this.el.getAttribute('id')].remove;
 		Views[this.el.getAttribute('id')] = this;
 		this.toRender = {error_text: error};
 		if(this.model) this.model.on('change', this.render, this);
 		if(this.collection) this.collection.on('change', this.render, this);
 		if(this.collection) this.collection.on('add', this.render, this);
 		this.render();	
+	}
+});
+
+var addedView = Parse.View.extend({
+	el: $('#leftColumnFirstDiv'),
+	template: Handlebars.compile($('#template-addedView').html()),
+	events: {
+		'click #copy': 'copy',
+		'click .shareFB' : 'shareFB',
+		'click .again': 'again'
+	},
+	initialize: function(rule, error) {
+		if(Views[this.el.getAttribute('id')]) Views[this.el.getAttribute('id')].remove();
+		Views[this.el.getAttribute('id')] = this;
+		this.toRender = {url: 'http://rulesby.me/vanadium23',
+							id: rule.id,
+						 	error: error ?  error.message : ""};
+		this.toRender.rule = rule;					
+		this.toRender.vkShare = VK.Share.button({
+		  url: 'http://rulesby.me' + document.location.pathname + '#rule/' + rule.id,
+		  title: 'Rules by ' + rule.get('author_name'),
+		  description : '1. ' + rule.get('rule1') + '\n' + ' 2. ' + rule.get('rule2') + '\n' + ' 3. ' + rule.get('rule3'),
+		  image: 'http://rulesby.me/img/logo_rbm.png',
+		  noparse: true
+		},
+		{
+			type : 'custom',
+			text : '<img src="http://rulesby.me/img/vkontakte.png" class="share_img vk"/>'
+		});
+		this.render();	
+	},
+	render: function() {
+		this.$el.html(this.template(this.toRender));
+	},
+	copy: function () {
+		var text_input = document.getElementById ('url');
+		text_input.focus ();
+		text_input.select ();
+	},
+	again: function() {
+		app.submitRule = new SubmitRuleView();
+	},
+	shareFB: function() {
+		FB.ui({
+	      method: 'feed',
+	      link: 'http://rulesby.me' + document.location.pathname + '#rule/' + this.toRender.rule.id,
+	      picture: 'http://rulesby.me/img/logo_rbm.png',
+	      name: 'Rules by ' + this.toRender.rule.get('author_name'),
+	      caption: 'RulesBy.Me',
+	      properties : { 1 : this.toRender.rule.get('rule1'), 2 : this.toRender.rule.get('rule2'), 3 : this.toRender.rule.get('rule3')}
+	    }, function() {
+	    	console.log('succes FB');
+	    })
 	}
 });
 
@@ -346,6 +395,7 @@ function trim (str) {
 	}
 	return str;
 }
+
 ////////////
 // ROUTER //
 ////////////
@@ -450,7 +500,7 @@ function loginWith(provider, user) {
 						re_render();
 					},
 					error: function(user, error) {
-						console.log('Днище ' + error.message);
+
 					}
 				})
 			}
