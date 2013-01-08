@@ -121,6 +121,42 @@ Parse.Cloud.define("someFunc", function(request, response) {
 	});
 });
 
+Parse.Cloud.beforeSave("Rule", function(request, response) {
+  if (request.object.get("num_id")) {
+    response.success();
+  } 
+  else {
+  	var query = new Parse.Query("Rule");
+  	query.count({
+  		success: function(count) {
+  			request.object.set("num_id", count);
+  			response.success();
+  		},
+  		error: function(error) {
+  			response.error(error.message);
+  		}
+  	});
+  }
+});
+
+Parse.Cloud.beforeSave("_User", function(request, response) {
+  if (request.object.get("num_id")) {
+    response.success();
+  }
+  else {
+  	var query = new Parse.Query("User");
+  	query.count({
+  		success: function(count) {
+  			request.object.set("num_id", count);
+  			response.success();
+  		},
+  		error: function(error) {
+  			response.error(error.message);
+  		}
+  	});
+  }
+});
+
 Parse.Cloud.define("Logger", function(request, response) {
   console.log(request);
   response.success();
