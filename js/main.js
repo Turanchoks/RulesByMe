@@ -1,7 +1,12 @@
 ////////////
 // CONFIG //
 ////////////
-// NEW
+
+var baseUrl = "http://rulesby.me/turanchoks";
+var baseUrlV = "http://rulesby.me/vanadium23";
+//DEBUG
+
+
 var positions = document.getElementsByClassName('position');
 var Views = {}; // Object with id's of elements for Views
 for (var i = 0; i < positions.length; i++) {
@@ -100,6 +105,52 @@ function submitRule() {
 		});
 	}
 }
+
+
+var Share = {
+    vkontakte: function(options) {
+        url  = 'http://vkontakte.ru/share.php?';
+        url += 'url='          + encodeURIComponent(options.url);
+        url += '&title='       + encodeURIComponent(options.title);
+        url += '&description=' + encodeURIComponent(options.text);
+        url += '&image='       + encodeURIComponent(options.img);
+        url += '&noparse=true';
+        Share.popup(url);
+    },
+    facebook: function(options) {
+        url  = 'http://www.facebook.com/sharer.php?s=100';
+        url += '&p[title]='     + encodeURIComponent(options.title);
+        url += '&p[summary]='   + encodeURIComponent(options.text);
+        url += '&p[url]='       + encodeURIComponent(options.url);
+        url += '&p[images][0]=' + encodeURIComponent(options.img);
+        Share.popup(url);
+    },
+    twitter: function(options) {
+        url  = 'http://twitter.com/share?';
+        url += 'text='      + encodeURIComponent(options.title);
+        url += '&url='      + encodeURIComponent(options.url);
+        url += '&counturl=' + encodeURIComponent(options.url);
+        url += '&hashtags=' + encodeURIComponent(options.hashtag)
+        Share.popup(url);
+    },
+    popup: function(url) {
+        window.open(url,'','toolbar=0,status=0,width=626,height=436');
+    },
+    go: function(model, social) {
+    	console.log(model, social);
+    	if(!model || !Share[social]) return;
+		var shareObj = {
+			url: baseUrl+'#rule/'+model.get('num_id'),
+			title: 'Rules by ' + model.get('author_name'),
+			text: '1. ' + model.get('rule1') + '\n' + ' 2. ' + model.get('rule2') + '\n' + ' 3. ' + model.get('rule3'),
+			image: 'http://rulesby.me/img/logo_rbm.png',
+			hashtag: 'RulesByMe'
+		};
+		Share[social](shareObj);
+    }
+};
+
+
 ////////////////
 // STRUCTURE  //
 ////////////////
@@ -116,22 +167,11 @@ var RuleView = Parse.View.extend({
 	template: Handlebars.compile($('#template-rule').html()),
 	events: {
 		'click .ratingChange' : 'ratingChange',
-		'click .shareFB' : 'shareFB'
+		'click .share img' : 'share'
 	},
 	init: function() {
 		this.model.set('datetime', dateToString(this.model.createdAt));
-		this.model.set('author_url', document.location.pathname + '#author/'+this.model.get('user').id);
-		this.model.set('vkShare', VK.Share.button({
-		  url: 'http://rulesby.me' + document.location.pathname + '#rule/' + this.model.id,
-		  title: 'Rules by ' + this.model.get('author_name'),
-		  description : '1. ' + this.model.get('rule1') + '\n' + ' 2. ' + this.model.get('rule2') + '\n' + ' 3. ' + this.model.get('rule3'),
-		  image: 'http://rulesby.me/img/logo_rbm.png',
-		  noparse: true
-		},
-		{
-			type : 'custom',
-			text : '<img src="http://rulesby.me/img/vkontakte.png" class="share_img vk"/>'
-		}));
+		this.model.set('author_url', '#author/'+this.model.get('user').get("num_id"));
 	},
 	ratingChange: function(e) {
 		if(!Parse.User.current()) 	{
@@ -152,19 +192,11 @@ var RuleView = Parse.View.extend({
 			});
 		}
 	},
-	shareFB: function() {
-		FB.ui({
-	      method: 'feed',
-	      link: 'http://rulesby.me' + document.location.pathname + '#rule/' + this.model.id,
-	      picture: 'http://rulesby.me/img/logo_rbm.png',
-	      name: 'Rules by ' + this.model.get('author_name'),
-	      caption: 'RulesBy.Me',
-	      properties : { 1 : this.model.get('rule1'), 2 : this.model.get('rule1'), 3 : this.model.get('rule1')}
-	    }, function() {
-	    	console.log('success FB');
-	    })
+	share: function(e) {
+		Share.go(this.model, e.srcElement.getAttribute('data-social'));
 	}
 });
+
 var RuleCollectionView = Parse.View.extend({
 	el: $('#rulesList'),
 	init: function() {
@@ -181,8 +213,6 @@ var RuleCollectionView = Parse.View.extend({
 	}
 });
 
-
-
 var SubmitRuleView = Parse.View.extend({
 	el: $('#leftColumnFirstDiv'),
 	template: Handlebars.compile($('#template-submitRule').html()),
@@ -198,7 +228,6 @@ var SubmitRuleView = Parse.View.extend({
 	},
 	submitRule : submitRule
 });
-
 
 var NavBarView = Parse.View.extend({
 	el: $('#navBar'),
@@ -268,51 +297,33 @@ var addedView = Parse.View.extend({
 	template: Handlebars.compile($('#template-addedView').html()),
 	events: {
 		'click #copy': 'copy',
-		'click .shareFB' : 'shareFB',
+		'click .share img' : 'share',
 		'click .again': 'again'
 	},
 	initialize: function(rule, error) {
 		if(Views[this.el.getAttribute('id')]) Views[this.el.getAttribute('id')].remove();
 		Views[this.el.getAttribute('id')] = this;
-		this.toRender = {url: 'http://rulesby.me/vanadium23',
-							id: rule.id,
-						 	error: error ?  error.message : ""};
-		this.toRender.rule = rule;					
-		this.toRender.vkShare = VK.Share.button({
-		  url: 'http://rulesby.me' + document.location.pathname + '#rule/' + rule.id,
-		  title: 'Rules by ' + rule.get('author_name'),
-		  description : '1. ' + rule.get('rule1') + '\n' + ' 2. ' + rule.get('rule2') + '\n' + ' 3. ' + rule.get('rule3'),
-		  image: 'http://rulesby.me/img/logo_rbm.png',
-		  noparse: true
-		},
-		{
-			type : 'custom',
-			text : '<img src="http://rulesby.me/img/vkontakte.png" class="share_img vk"/>'
-		});
+		this.model = rule;
+		this.toRender = {
+			url: baseUrl,
+			id: rule.get('num_id'),
+		 	error: error ?  error.message : ""
+		};
 		this.render();	
 	},
 	render: function() {
 		this.$el.html(this.template(this.toRender));
 	},
 	copy: function () {
-		var text_input = document.getElementById ('url');
-		text_input.focus ();
-		text_input.select ();
+		var text_input = document.getElementById('url');
+		text_input.focus();
+		text_input.select();
 	},
 	again: function() {
 		app.submitRule = new SubmitRuleView();
 	},
-	shareFB: function() {
-		FB.ui({
-	      method: 'feed',
-	      link: 'http://rulesby.me' + document.location.pathname + '#rule/' + this.toRender.rule.id,
-	      picture: 'http://rulesby.me/img/logo_rbm.png',
-	      name: 'Rules by ' + this.toRender.rule.get('author_name'),
-	      caption: 'RulesBy.Me',
-	      properties : { 1 : this.toRender.rule.get('rule1'), 2 : this.toRender.rule.get('rule2'), 3 : this.toRender.rule.get('rule3')}
-	    }, function() {
-	    	console.log('succes FB');
-	    })
+	share: function(e) {
+		Share.go(this.model, e.srcElement.getAttribute('data-social'));
 	}
 });
 
