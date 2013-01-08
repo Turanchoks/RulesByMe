@@ -120,7 +120,7 @@ var RuleView = Parse.View.extend({
 	},
 	init: function() {
 		this.model.set('datetime', dateToString(this.model.createdAt));
-		this.model.set('author_url', document.location.pathname + '#author/'+this.model.get('user').id);
+		this.model.set('author_url', document.location.pathname + '#author/'+this.model.get('user'));
 		this.model.set('vkShare', VK.Share.button({
 		  url: 'http://rulesby.me' + document.location.pathname + '#rule/' + this.model.id,
 		  title: 'Rules by ' + this.model.get('author_name'),
@@ -132,6 +132,8 @@ var RuleView = Parse.View.extend({
 			type : 'custom',
 			text : '<img src="http://rulesby.me/img/vkontakte.png" class="share_img vk"/>'
 		}));
+		this.model.set("num_id", this.model.get("num_id"));
+		this.model.set("url", "http://rulesby.me/vanadium23");
 	},
 	ratingChange: function(e) {
 		if(!Parse.User.current()) 	{
@@ -275,7 +277,7 @@ var addedView = Parse.View.extend({
 		if(Views[this.el.getAttribute('id')]) Views[this.el.getAttribute('id')].remove();
 		Views[this.el.getAttribute('id')] = this;
 		this.toRender = {url: 'http://rulesby.me/vanadium23',
-							id: rule.id,
+							id: rule.get("num_id"),
 						 	error: error ?  error.message : ""};
 		this.toRender.rule = rule;					
 		this.toRender.vkShare = VK.Share.button({
@@ -372,12 +374,10 @@ function queryRules(condition, options) {
             query.greaterThanOrEqualTo('createdAt', date);
             break;
         case 'byAuthor':
-        	var author = new Parse.User();
-        	author.id = options.id;
-        	query.equalTo('user', author);
+        	query.equalTo('user', parseInt(options.id));
             break;
         case 'oneRule':
-        	query.equalTo('objectId', options.id);
+        	query.equalTo("num_id", parseInt(options.id));
         	break;
         case 'new':
         	break;
@@ -441,7 +441,7 @@ var Router = Parse.Router.extend({
         });
     },
 	oneRule: function(id) {
-		queryRules('oneRule', {id:id}).fetch({
+		(queryRules('oneRule', {id:id})).fetch({
             success: function(collection) {
                 app.rulesView.collection = collection;
                 app.rulesView.render();
@@ -456,6 +456,7 @@ var Router = Parse.Router.extend({
     	if(page) var page = parseInt(Math.abs(page));
     	queryRules('byAuthor', {id:id, page: page}).fetch({
             success: function(collection) {
+            	console.log(collection);
                 app.rulesView.collection = collection.sortBy(function(rule) {
                 	return rule.get('createdAt')
                 });
@@ -487,7 +488,6 @@ var Router = Parse.Router.extend({
 //  EVENTS  //
 //////////////
 function loginWith(provider, user) {
-	console.log(user);
 	var query = new Parse.Query('User');
 	query.equalTo(provider + "_id", user[provider + "_id"]);
 	query.find({
