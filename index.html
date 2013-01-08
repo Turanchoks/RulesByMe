@@ -87,35 +87,20 @@
                 <div class="rating">
                     <a class="ratingChange" data-add-rating="1">+</a>
                     <span class="ratingValue">{{rating}}</span>
-                    <a class="ratingChange" data-add-rating="-1">–</a>                        
+                    <a class="ratingChange" data-add-rating="-1">–</a>
                 </div>
-                <div class="ruleDatetime">{{datetime}}</div>
-                <div class="share clearfix">{{{vkShare}}} <img src='http://rulesby.me/img/facebook.png' class='shareFB'/></div>
+                <div class="ruleDatetime">
+                    {{datetime}}
+                </div>
+                <div class="share clearfix">
+                    <img src='http://rulesby.me/img/facebook.png' data-social="facebook"/>
+                    <img src='http://rulesby.me/img/vkontakte.png' data-social="vkontakte"/>
+                    <img src='http://rulesby.me/img/twitter.png' data-social="twitter"/>
+                </div>
             </div>
         </script>
 
-        <script type="text/x-handlebars-template" id='template-ruleCollection'>
-            <ul>
-                {{#each ruleCollection}}
-                <div id="rule-id-{{objectId}}">
-                    <div class='author'>
-                        Rule By <a href="{{author.url}}" class="authorUrl">{{author_name}}</a>
-                    </div>
-                    <ol class='rulesList'>
-                        <li>{{rule1}}</li>
-                        <li>{{rule2}}</li>
-                        <li>{{rule3}}</li>
-                    </ol>
-                    <div class="rating">
-                        <a class="ratingChange" data-add-rating="1">+</a>
-                        <span class="ratingValue">{{rating}}</span>
-                        <a class="ratingChange" data-add-rating="-1">–</a>                        
-                    </div>
-                    <div class="ruleDatetime">{{datetime}}</div>
-                </div>
-                {{/each}}
-            </ul>
-        </script>
+
 
         <script type="text/x-handlebars-template" id="template-submitRule">
             <h1>Добавить свои правила</h1>
@@ -219,7 +204,11 @@
                 <a class="btn btn-info again">Хотите добавить еще правил?</a>
                 <a class="btn btn-info" href="{{url}}/#myRules">Страница моих правил</a>
                 <h4>Поделитесь ссылочкой ;-)</h4> 
-                {{{vkShare}}} <img src='http://rulesby.me/img/facebook.png' class='shareFB'/>
+                <div class="share clearfix">
+                    <img src='http://rulesby.me/img/facebook.png' data-social="facebook"/>
+                    <img src='http://rulesby.me/img/vkontakte.png' data-social="vkontakte"/>
+                    <img src='http://rulesby.me/img/twitter.png' data-social="twitter"/>
+                </div>
             {{/if}}
         </script>
 
