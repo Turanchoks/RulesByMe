@@ -438,7 +438,7 @@ var Router = Parse.Router.extend({
 	},
     myRules: function() {
     	if(page) var page = parseInt(Math.abs(page));
-		queryRules('byAuthor', {id: Parse.User.current().id, page: page}).fetch({
+		queryRules('byAuthor', {id: Parse.User.current().get("num_id"), page: page}).fetch({
             success: function(collection) {
                 app.rulesView.collection = collection;
                 app.rulesView.render();
