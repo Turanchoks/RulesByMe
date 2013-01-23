@@ -97,10 +97,10 @@ function submitRule() {
 		Parse.Cloud.run('addRule', objectToPublish, {
 			success: function(obj) {
 				$('.submission').find('input').val(''); // Clear inputs
-				app.addedView = new addedView(obj);
+				app.addedView = new AddedView(obj);
 			},
 			error: function(error, obj) {
-				app.addedView = new addedView(obj, error);	
+				app.addedView = new AddedView(obj, error);	
 			}
 		});
 	}
@@ -292,7 +292,7 @@ var ErrorView = Parse.View.extend({
 	}
 });
 
-var addedView = Parse.View.extend({
+var AddedView = Parse.View.extend({
 	el: $('#leftColumnFirstDiv'),
 	template: Handlebars.compile($('#template-addedView').html()),
 	events: {
@@ -332,18 +332,20 @@ var PaginationView = Parse.View.extend({
 	template: Handlebars.compile($('#template-pagination').html()),
 	initialize: function() {
 		Views[this.el.getAttribute('id')] = this;
-		this.render();
+		// this.render();
 	},
 	render: function(where, page) {
 		if(page) {
 			var toRender = {
 				prev: '#'+where+'/'+(page-1),
-				next: '#'+where+'/'+(page+1)
+				next: '#'+where+'/'+(page+1),
+				isLast: (app.rulesView.collection.length < 5) ? true : false
 			};			
 		} else {
 			var toRender = {
 				next: '#'+where+'/1',
-				isFirst: true
+				isFirst: true,
+				isLast: (app.rulesView.collection.length < 5) ? true : false
 			};				
 		};
 		this.$el.html(this.template(toRender));
@@ -431,7 +433,10 @@ var Router = Parse.Router.extend({
                 app.rulesView.collection = collection.sortBy(function(rule) {
                 	return rule.get('createdAt')
                 });;
-                app.rulesView.render();
+                if(!collection.length) 
+                	$('#rulesList').html('<li class="noMoreRules"> Больше правил нет :(</li>')
+                else
+                	app.rulesView.render();
                 app.paginationView.render("best/"+period, page);
             }
         });
@@ -441,7 +446,10 @@ var Router = Parse.Router.extend({
 		queryRules('byAuthor', {id: Parse.User.current().get("num_id"), page: page}).fetch({
             success: function(collection) {
                 app.rulesView.collection = collection;
-                app.rulesView.render();
+                if(!collection.length) 
+                	$('#rulesList').html('<li class="noMoreRules"> Больше правил нет :(</li>')
+                else
+                	app.rulesView.render();
                 app.paginationView.render("myRules", page);
             }, 
             error: function() {
@@ -469,7 +477,10 @@ var Router = Parse.Router.extend({
                 app.rulesView.collection = collection.sortBy(function(rule) {
                 	return rule.get('createdAt')
                 });
-                app.rulesView.render();
+                if(!collection.length) 
+                	$('#rulesList').html('<li class="noMoreRules"> Больше правил нет :(</li>')
+                else
+                	app.rulesView.render();
                 app.paginationView.render("author/"+id, page);
             }, 
             error: function() {
@@ -484,7 +495,10 @@ var Router = Parse.Router.extend({
                 app.rulesView.collection = collection.sortBy(function(rule) {
                 	return rule.get('createdAt')
                 });
-                app.rulesView.render();
+                if(!collection.length) 
+                	$('#rulesList').html('<li class="noMoreRules"> Больше правил нет :(</li>')
+                else
+                	app.rulesView.render();
                 app.paginationView.render("newRules", page);
             }, 
             error: function() {

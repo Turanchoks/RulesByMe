@@ -69,7 +69,7 @@
         <script type="text/x-handlebars-template" id='template-pagination'>
             <ul class="pager">
               <li><a href="{{prev}}" {{#if isFirst}}class="hidden"{{/if}}>Previous</a></li>
-              <li><a href="{{next}}">Next</a></li>
+              <li><a href="{{next}}" {{#if isLast}}class="hidden"{{/if}}>Next</a></li>
             </ul>
         </script>
 
