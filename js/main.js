@@ -54,7 +54,6 @@ function submitRule() {
 	}
 	else {
 		if (app.error) app.error.remove(); 
-
 		var now = new Date();
 		var objectToPublish = {
 			rule1: $('input#rule1').val(),
@@ -62,9 +61,7 @@ function submitRule() {
 			rule3: $('input#rule3').val(),
 			author: $('input#author').val()
 		};
-
 		var error = [];
-
 		for (var i = 1; i < 4; i++) {
 			if($('input#rule' + i).parent().hasClass("error")) {
 				$('input#rule' + i).parent().removeClass("error");
