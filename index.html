@@ -18,10 +18,9 @@
         </style>
         <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
         <!-- <link rel="stylesheet" href="css/main.css"> -->
-        <link rel="stylesheet/less" type="text/css" href="css/mainStyles.less">
+        <link rel="stylesheet" href="css/mainStyles.css">
         <link rel="stylesheet" href="css/fontello.css">
         <script src="js/vendor/modernizr-2.6.1-respond-1.1.0.min.js"></script>
-        <script src="js/less.js" type="text/javascript"></script>
     </head>
     <body>
         <!-- FB init -->
@@ -33,14 +32,14 @@
         <div id="navBar" class='position'></div>
 
         <div class="container">
-            <div class="row">
+            <div class="row-fluid">
                 <div class="span6 leftColumn">
                     <div class="position head" id="leftColumnHead"></div>
-                    <div class="position" id="leftColumnFirstDiv"></div>
+                    <div class="position hidden-phone" id="leftColumnFirstDiv"></div>
                     <div class="position" id="leftColumnSecondDiv"></div>
                 </div>
                 <div class="span6 rightColumn">
-                    <div class="position head clearfix" id="rulesNav"></div>
+                    <div class="position head clearfix row-fluid col-wrap" id="rulesNav"></div>
                     <ul class="position" id="rulesList" ></ul>
                     <div id="pagination" class="position"></div>
                 </div>                
@@ -75,21 +74,36 @@
 
         <script type="text/x-handlebars-template" id='template-rule'>
             <div id="rule-id-{{objectId}}" class="clearfix">
-                <div class='author'>
-                    Rule By <a href="{{author_url}}" class="authorUrl">{{author_name}}</a>
-                    <a class="hashtag" href="#rule/{{num_id}}">#{{num_id}}</a>
+                <div class='row-fluid'>
+                    <div class='span9'>
+                        <h3 class='hidden-phone'>
+                                Rule By <a href="{{author_url}}" class="authorUrl">{{author_name}}</a>
+                                <a class="hashtag" href="#rule/{{num_id}}">#{{num_id}}</a>
+                        </h3>
+                        <h5 class='visible-phone'>
+                                Rule By <a href="{{author_url}}" class="authorUrl">{{author_name}}</a>
+                                <a class="hashtag" href="#rule/{{num_id}}">#{{num_id}}</a>
+                        </h5>
+                    </div>
+                    <div class="span3">
+                        <h3 class='hidden-phone'>
+                            <a class="ratingChange" data-add-rating="1">+</a>
+                            <span class="ratingValue">{{rating}}</span>
+                            <a class="ratingChange" data-add-rating="-1">–</a>
+                        </h3>
+                    </div>
                 </div>
                 <ol class='rulesList'>
                     <li>{{rule1}}</li>
                     <li>{{rule2}}</li>
                     <li>{{rule3}}</li>
                 </ol>
-                <div class="rating">
+                <h1 class='visible-phone rating'>
                     <a class="ratingChange" data-add-rating="1">+</a>
                     <span class="ratingValue">{{rating}}</span>
                     <a class="ratingChange" data-add-rating="-1">–</a>
-                </div>
-                <div class="ruleDatetime">
+                </h1>
+                <div class="ruleDatetime muted">
                     {{datetime}}
                 </div>
                 <div class="share clearfix">
@@ -127,9 +141,17 @@
         </script>
 
         <script type="text/x-handlebars-template" id="template-rulesNav">
-            <a href="#newRules"><div class="span2">Последние</div></a>
-            <a href="#best/week"><div class="span2">Лучшие недели</div></a>
-            <a href="#best/month"><div class="span2">Лучшие месяца</div></a>
+                <ul class='nav nav-tabs'>
+                    <li>
+                        <a href="#newRules">Последние</a>
+                    </li>
+                    <li>
+                        <a href="#best/week">Лучшие недели</a>
+                    </li>
+                    <li>
+                        <a href="#best/month">Лучшие месяца</a>
+                    </li>
+                </ul>
         </script>
 
         <script type="text/x-handlebars-template" id="template-navBar">
@@ -172,13 +194,23 @@
                 <h3>Авторизация</h3>
             </div>
             <div class="modal-body">
-                <p>
-                    Войти с помощью
-                    <a href="#" class="nounderline"><i class="icon-facebook" id="login"></i></a>
-                    <a href="#" class="nounderline"><i class="icon-twitter"></i><a>
-                    <a href="#" class="nounderline"><i class="icon-vk"></i></a>
-                    <a href="#" class="nounderline"><i class="icon-gplus"></i><a>
-                </p>
+                <div class='row-fluid'>
+                    <div class='span4'>
+                        <h4>Войти с помощью</h4>
+                    </div>
+                    <div class='span1'>
+                        <a href="#" class="nounderline"><i class="icon-facebook" id="login"></i></a>
+                    </div>
+                    <div class='span1'>
+                        <a href="#" class="nounderline"><i class="icon-twitter"></i><a>
+                    </div>
+                    <div class='span1'>
+                        <a href="#" class="nounderline"><i class="icon-vk"></i></a>
+                    </div>
+                    <div class='span1'>
+                        <a href="#" class="nounderline"><i class="icon-gplus"></i><a>
+                    </div>
+                </div>
             </div>
         </script>
 
