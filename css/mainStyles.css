@@ -1,0 +1,92 @@
+﻿/* CSS crunched with Crunch - http://crunchapp.net/ */
+html {
+  font-size: 75%;
+}
+body {
+  font-size: 1em;
+}
+#rulesNav {
+  font-size: 1.5em;
+}
+.col {
+  color: #f89406;
+}
+.col:hover,
+.col:focus {
+  color: white;
+  background-color: #f89406;
+  text-decoration: none;
+  border-color: #AB6503;
+}
+.col-wrap{
+    overflow: hidden; 
+}
+.nav {
+  margin-bottom: 0;
+  border-bottom-color: #AB6503;
+}
+.choosen {
+  border-top: medium solid #f89406;
+}
+#rulesList {
+  list-style: none;
+  margin: 0;
+}
+#rulesList .rule:nth-child(odd) {
+  background-color: #eeeeee;
+}
+.rule {
+  padding: 10px 20px;
+  position: relative;
+}
+.ruleDatetime {
+  font-style: italic;
+}
+.author {
+  line-height: 2em;
+  font-size: 1.5em;
+}
+.authorUrl {
+  color: #f89406;
+  font-weight: bold;
+  font-size: 1em;
+}
+.rating {
+  position: absolute;
+  top: 40%;
+  right: 10%;
+}
+.ratingValue {
+  color: black;
+  vertical-align: middle;
+}
+.ratingChange {
+  cursor: pointer;
+  width: 2em;
+  vertical-align: middle;
+  text-align: center;
+  color: #f89406;
+}
+.ratingChange:hover,
+.ratingChange:focus {
+  text-decoration: none;
+  color: white;
+  background-color: #f89406;
+}
+.loading {
+  text-align: center;
+  display: none;
+}
+a .nounderline {
+  text-decoration: none;
+  color: #f89406;
+  margin: 10px;
+}
+.share {
+  float: right;
+  cursor: pointer;
+}
+.share img {
+  width: 2em;
+  height: 2em;
+}
