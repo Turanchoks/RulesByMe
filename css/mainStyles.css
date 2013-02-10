@@ -23,7 +23,8 @@ body {
 }
 .nav {
   margin-bottom: 0;
-  border-bottom-color: #AB6503;
+  border: none;
+  z-index: 100;
 }
 .choosen {
   border-top: medium solid #f89406;
@@ -31,6 +32,7 @@ body {
 #rulesList {
   list-style: none;
   margin: 0;
+  /*border-top: thin solid #AB6503;*/
 }
 #rulesList .rule:nth-child(odd) {
   background-color: #eeeeee;
@@ -53,7 +55,7 @@ body {
 }
 .rating {
   position: absolute;
-  top: 40%;
+  top: 30%;
   right: 10%;
 }
 .ratingValue {
@@ -73,6 +75,9 @@ body {
   color: white;
   background-color: #f89406;
 }
+.iconRBM {
+  margin: 0 2em 0 0;
+}
 .loading {
   text-align: center;
   display: none;
@@ -89,4 +94,28 @@ a .nounderline {
 .share img {
   width: 2em;
   height: 2em;
+}
+.phone-rules {
+  width: 60%;
+}
+
+/*Phone*/
+@media (max-width: 480px) {
+  body {
+    padding: 0 0px 40px 0;
+  }
+  .navbar {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .share {
+    float: right;
+  }
+  .share img {
+    width: 4em;
+    height: 4em;
+  }
+  .modal.fade.in {
+    top: 16%;
+  }
 }

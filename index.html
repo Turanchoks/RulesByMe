@@ -19,6 +19,7 @@
         <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
         <!-- <link rel="stylesheet" href="css/main.css"> -->
         <link rel="stylesheet" href="css/mainStyles.css">
+        <link rel="stylesheet" media="all and (max-device-width: 480px)" href="css/phoneStyles.css"/>
         <link rel="stylesheet" href="css/fontello.css">
         <script src="js/vendor/modernizr-2.6.1-respond-1.1.0.min.js"></script>
     </head>
@@ -68,43 +69,71 @@
         <script type="text/x-handlebars-template" id='template-pagination'>
             <ul class="pager">
               <li><a href="{{prev}}" {{#if isFirst}}class="hidden"{{/if}}>Previous</a></li>
-              <li><a href="{{next}}">Next</a></li>
+              <li><a href="{{next}}" {{#if isLast}}class="hidden"{{/if}}>Next</a></li>
             </ul>
         </script>
 
         <script type="text/x-handlebars-template" id='template-rule'>
             <div id="rule-id-{{objectId}}" class="clearfix">
-                <div class='row-fluid'>
-                    <div class='span9'>
-                        <h3 class='hidden-phone'>
+            
+            <!-- // For big and medium screen. -->
+                <div class='hidden-phone'>
+                    <div class='row-fluid'>
+                        <div class='span9'>
+                            <h3>
                                 Rule By <a href="{{author_url}}" class="authorUrl">{{author_name}}</a>
                                 <a class="hashtag" href="#rule/{{num_id}}">#{{num_id}}</a>
-                        </h3>
-                        <h5 class='visible-phone'>
-                                Rule By <a href="{{author_url}}" class="authorUrl">{{author_name}}</a>
-                                <a class="hashtag" href="#rule/{{num_id}}">#{{num_id}}</a>
-                        </h5>
+                            </h3>
+                        </div>
+                        <div class="span3">
+                            <h3 class='hidden-phone'>
+                                <a class="ratingChange" data-add-rating="1">+</a>
+                                <span class="ratingValue">{{rating}}</span>
+                                <a class="ratingChange" data-add-rating="-1">–</a>
+                            </h3>
+                        </div>
                     </div>
-                    <div class="span3">
-                        <h3 class='hidden-phone'>
-                            <a class="ratingChange" data-add-rating="1">+</a>
-                            <span class="ratingValue">{{rating}}</span>
-                            <a class="ratingChange" data-add-rating="-1">–</a>
-                        </h3>
+                    <div class='row-fluid'>
+                        <div>
+                            <ol>
+                                <li>{{rule1}}</li>
+                                <li>{{rule2}}</li>
+                                <li>{{rule3}}</li>
+                            </ol>
+                            <div class="ruleDatetime muted">
+                                {{datetime}}
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <ol class='rulesList'>
-                    <li>{{rule1}}</li>
-                    <li>{{rule2}}</li>
-                    <li>{{rule3}}</li>
-                </ol>
-                <h1 class='visible-phone rating'>
-                    <a class="ratingChange" data-add-rating="1">+</a>
-                    <span class="ratingValue">{{rating}}</span>
-                    <a class="ratingChange" data-add-rating="-1">–</a>
-                </h1>
-                <div class="ruleDatetime muted">
-                    {{datetime}}
+
+            <!-- // Oppa just phone style -->
+                <div class='visible-phone'>
+                    <div class='row-fluid'>
+                        <div class='span12'>
+                            <h5>
+                                Rule By <a href="{{author_url}}" class="authorUrl">{{author_name}}</a>
+                                <a class="hashtag" href="#rule/{{num_id}}">#{{num_id}}</a>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class='row-fluid'>
+                        <div class='phone-rules'>
+                            <ol class='rulesList'>
+                                <li>{{rule1}}</li>
+                                <li>{{rule2}}</li>
+                                <li>{{rule3}}</li>
+                            </ol>
+                            <div class="ruleDatetime muted">
+                                {{datetime}}
+                            </div>
+                        </div>
+                    </div>
+                    <h1 class='rating'>
+                        <a class="ratingChange" data-add-rating="1">+</a>
+                        <span class="ratingValue">{{rating}}</span>
+                        <a class="ratingChange" data-add-rating="-1">–</a>
+                    </h1>
                 </div>
                 <div class="share clearfix">
                     <img src='http://rulesby.me/img/facebook.png' data-social="facebook"/>
@@ -145,12 +174,17 @@
                     <li>
                         <a href="#newRules">Последние</a>
                     </li>
+                    <br class='visible-phone' />
+                    <br class='visible-phone' />
                     <li>
                         <a href="#best/week">Лучшие недели</a>
                     </li>
+                    <br class='visible-phone' />
+                    <br class='visible-phone' />
                     <li>
                         <a href="#best/month">Лучшие месяца</a>
                     </li>
+                    <br class='visible-phone' />
                 </ul>
         </script>
 
@@ -191,26 +225,13 @@
         <script type="text/x-handlebars-template" id="template-logInView">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3>Авторизация</h3>
+                <h3>Войти с помощью</h3>
             </div>
             <div class="modal-body">
-                <div class='row-fluid'>
-                    <div class='span4'>
-                        <h4>Войти с помощью</h4>
-                    </div>
-                    <div class='span1'>
-                        <a href="#" class="nounderline"><i class="icon-facebook" id="login"></i></a>
-                    </div>
-                    <div class='span1'>
-                        <a href="#" class="nounderline"><i class="icon-twitter"></i><a>
-                    </div>
-                    <div class='span1'>
-                        <a href="#" class="nounderline"><i class="icon-vk"></i></a>
-                    </div>
-                    <div class='span1'>
-                        <a href="#" class="nounderline"><i class="icon-gplus"></i><a>
-                    </div>
-                </div>
+                <a href="#" class="nounderline"><i class="iconRBM icon-facebook" id="login"></i></a>
+                <a href="#" class="nounderline"><i class="iconRBM icon-twitter"></i><a>
+                <a href="#" class="nounderline"><i class="iconRBM icon-vk"></i></a>
+                <a href="#" class="nounderline"><i class="iconRBM icon-gplus"></i><a>
             </div>
         </script>
 
